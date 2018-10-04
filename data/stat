@@ -1,0 +1,25 @@
+FUN FACT: changing the "comment number" gives you different combinations of comments, the same 6 are not always linked together.
+
+
+R1 = the request that gets the comments
+
+
+Strategy for a given page:
+
+1. work out exactly how low you have to set the comment number to start getting new comments (see below)
+2. set the comment number to that
+3. keep sending R1, decreasing the comment number by some small-ish number each time and checking the response
+4. If the response has the content-type application-x/javascript, send the comments off to be saved
+5. If the response has the content-type text/html, we're done
+
+
+Strategy for working out how low to set comment number
+
+1. start with stupidly high comment number
+2. decrement it a little bit if this is the first time you've reached 2., otherwise decrement by exponentially more than you decremented it last time
+3. send R1 and check response with the new comment number
+4. if the response is different from last time move to 5, otherwise move to 2
+
+5. Increment the comment number by a small amount if this is the first time you've reached 5, or an exponentially greater amount on all other times
+6. send R1 and check response with the new comment number
+7. If the response is the original response, the current comment number is the one we want, otherwise go to 5
