@@ -1,0 +1,5321 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.5.14
+-- Dumped by pg_dump version 9.5.14
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: a_arbitrages; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.a_arbitrages (
+    id integer NOT NULL,
+    identified_at timestamp without time zone DEFAULT now() NOT NULL,
+    hash character(30) NOT NULL,
+    completed_at timestamp without time zone,
+    success boolean
+);
+
+
+ALTER TABLE public.a_arbitrages OWNER TO postgres;
+
+--
+-- Name: a_arbitrages_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.a_arbitrages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.a_arbitrages_id_seq OWNER TO postgres;
+
+--
+-- Name: a_arbitrages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.a_arbitrages_id_seq OWNED BY public.a_arbitrages.id;
+
+
+--
+-- Name: a_bets; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.a_bets (
+    id integer NOT NULL,
+    amount double precision NOT NULL,
+    outcome_id integer,
+    arbitrage_id integer,
+    login_id integer
+);
+
+
+ALTER TABLE public.a_bets OWNER TO postgres;
+
+--
+-- Name: a_bets_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.a_bets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.a_bets_id_seq OWNER TO postgres;
+
+--
+-- Name: a_bets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.a_bets_id_seq OWNED BY public.a_bets.id;
+
+
+--
+-- Name: a_event_outcomes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.a_event_outcomes (
+    id integer NOT NULL,
+    event_id integer,
+    name character varying(50) DEFAULT 'NO NAME'::character varying NOT NULL
+);
+
+
+ALTER TABLE public.a_event_outcomes OWNER TO postgres;
+
+--
+-- Name: a_event_outcomes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.a_event_outcomes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.a_event_outcomes_id_seq OWNER TO postgres;
+
+--
+-- Name: a_event_outcomes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.a_event_outcomes_id_seq OWNED BY public.a_event_outcomes.id;
+
+
+--
+-- Name: a_events; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.a_events (
+    id integer NOT NULL,
+    name character varying(200) NOT NULL,
+    logged_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.a_events OWNER TO postgres;
+
+--
+-- Name: a_events_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.a_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.a_events_id_seq OWNER TO postgres;
+
+--
+-- Name: a_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.a_events_id_seq OWNED BY public.a_events.id;
+
+
+--
+-- Name: a_odds; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.a_odds (
+    id integer NOT NULL,
+    logged_at timestamp without time zone DEFAULT now() NOT NULL,
+    value double precision DEFAULT 0 NOT NULL,
+    outcome_id integer,
+    provider_id integer
+);
+
+
+ALTER TABLE public.a_odds OWNER TO postgres;
+
+--
+-- Name: a_odds_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.a_odds_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.a_odds_id_seq OWNER TO postgres;
+
+--
+-- Name: a_odds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.a_odds_id_seq OWNED BY public.a_odds.id;
+
+
+--
+-- Name: a_outcomes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.a_outcomes (
+    id integer NOT NULL,
+    name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.a_outcomes OWNER TO postgres;
+
+--
+-- Name: a_outcomes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.a_outcomes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.a_outcomes_id_seq OWNER TO postgres;
+
+--
+-- Name: a_outcomes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.a_outcomes_id_seq OWNED BY public.a_outcomes.id;
+
+
+--
+-- Name: a_providers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.a_providers (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL,
+    arbitrage_count integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.a_providers OWNER TO postgres;
+
+--
+-- Name: a_providers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.a_providers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.a_providers_id_seq OWNER TO postgres;
+
+--
+-- Name: a_providers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.a_providers_id_seq OWNED BY public.a_providers.id;
+
+
+--
+-- Name: id_as_attributes_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_as_attributes_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_as_attributes_seq OWNER TO rodneyadler;
+
+--
+-- Name: as_attributes; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.as_attributes (
+    id integer DEFAULT nextval('public.id_as_attributes_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.as_attributes OWNER TO rodneyadler;
+
+--
+-- Name: id_as_expectations_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_as_expectations_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_as_expectations_seq OWNER TO rodneyadler;
+
+--
+-- Name: as_expectations; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.as_expectations (
+    id integer DEFAULT nextval('public.id_as_expectations_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.as_expectations OWNER TO rodneyadler;
+
+--
+-- Name: id_as_names_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_as_names_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_as_names_seq OWNER TO rodneyadler;
+
+--
+-- Name: as_names; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.as_names (
+    id integer DEFAULT nextval('public.id_as_names_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.as_names OWNER TO rodneyadler;
+
+--
+-- Name: id_as_selectors_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_as_selectors_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_as_selectors_seq OWNER TO rodneyadler;
+
+--
+-- Name: as_selectors; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.as_selectors (
+    id integer DEFAULT nextval('public.id_as_selectors_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.as_selectors OWNER TO rodneyadler;
+
+--
+-- Name: id_assignments_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_assignments_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_assignments_seq OWNER TO rodneyadler;
+
+--
+-- Name: assignments; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.assignments (
+    id integer DEFAULT nextval('public.id_assignments_seq'::regclass) NOT NULL,
+    selector_id integer,
+    name_id integer,
+    body boolean DEFAULT true NOT NULL,
+    attribute_id integer,
+    vital boolean DEFAULT false NOT NULL,
+    multi boolean DEFAULT false NOT NULL,
+    regex character varying(100) DEFAULT 'NO_REGEX'::character varying NOT NULL
+);
+
+
+ALTER TABLE public.assignments OWNER TO rodneyadler;
+
+--
+-- Name: id_bd_keys_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_bd_keys_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_bd_keys_seq OWNER TO rodneyadler;
+
+--
+-- Name: bd_keys; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.bd_keys (
+    id integer DEFAULT nextval('public.id_bd_keys_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.bd_keys OWNER TO rodneyadler;
+
+--
+-- Name: id_bd_values_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_bd_values_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_bd_values_seq OWNER TO rodneyadler;
+
+--
+-- Name: bd_values; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.bd_values (
+    id integer DEFAULT nextval('public.id_bd_values_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.bd_values OWNER TO rodneyadler;
+
+--
+-- Name: id_body_fields_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_body_fields_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_body_fields_seq OWNER TO rodneyadler;
+
+--
+-- Name: body_fields; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.body_fields (
+    id integer DEFAULT nextval('public.id_body_fields_seq'::regclass) NOT NULL,
+    key_id integer,
+    value_id integer
+);
+
+
+ALTER TABLE public.body_fields OWNER TO rodneyadler;
+
+--
+-- Name: id_expectations_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_expectations_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_expectations_seq OWNER TO rodneyadler;
+
+--
+-- Name: expectations; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.expectations (
+    id integer DEFAULT nextval('public.id_expectations_seq'::regclass) NOT NULL,
+    expectation_id integer,
+    selector_id integer,
+    attribute_id integer,
+    body boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE public.expectations OWNER TO rodneyadler;
+
+--
+-- Name: id_hd_keys_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_hd_keys_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_hd_keys_seq OWNER TO rodneyadler;
+
+--
+-- Name: hd_keys; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.hd_keys (
+    id integer DEFAULT nextval('public.id_hd_keys_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.hd_keys OWNER TO rodneyadler;
+
+--
+-- Name: id_hd_values_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_hd_values_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_hd_values_seq OWNER TO rodneyadler;
+
+--
+-- Name: hd_values; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.hd_values (
+    id integer DEFAULT nextval('public.id_hd_values_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.hd_values OWNER TO rodneyadler;
+
+--
+-- Name: id_headers_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_headers_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_headers_seq OWNER TO rodneyadler;
+
+--
+-- Name: headers; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.headers (
+    id integer DEFAULT nextval('public.id_headers_seq'::regclass) NOT NULL,
+    key_id integer,
+    value_id integer
+);
+
+
+ALTER TABLE public.headers OWNER TO rodneyadler;
+
+--
+-- Name: id_hostnames_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_hostnames_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_hostnames_seq OWNER TO rodneyadler;
+
+--
+-- Name: hostnames; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.hostnames (
+    id integer DEFAULT nextval('public.id_hostnames_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.hostnames OWNER TO rodneyadler;
+
+--
+-- Name: id_bodies_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_bodies_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_bodies_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_ck_names_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_ck_names_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_ck_names_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_ck_values_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_ck_values_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_ck_values_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_md_names_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_md_names_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_md_names_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_md_parts_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_md_parts_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_md_parts_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_md_properties_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_md_properties_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_md_properties_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_methods_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_methods_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_methods_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_modifiers_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_modifiers_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_modifiers_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_p_logins_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_p_logins_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_p_logins_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_p_people_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_p_people_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_p_people_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_path_map_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_path_map_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_path_map_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_path_parts_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_path_parts_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_path_parts_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_paths_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_paths_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_paths_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_request_fields_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_request_fields_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_request_fields_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_request_headers_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_request_headers_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_request_headers_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_request_modifiers_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_request_modifiers_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_request_modifiers_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_requests_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_requests_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_requests_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_schemes_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_schemes_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_schemes_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_scrape_steps_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_scrape_steps_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_scrape_steps_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_scrapes_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_scrapes_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_scrapes_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_step_assignments_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_step_assignments_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_step_assignments_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_step_expectations_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_step_expectations_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_step_expectations_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_steps_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_steps_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_steps_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_url_paths_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_url_paths_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_url_paths_seq OWNER TO rodneyadler;
+
+--
+-- Name: id_urls_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.id_urls_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.id_urls_seq OWNER TO rodneyadler;
+
+--
+-- Name: md_names; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.md_names (
+    id integer DEFAULT nextval('public.id_md_names_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.md_names OWNER TO rodneyadler;
+
+--
+-- Name: md_parts; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.md_parts (
+    id integer DEFAULT nextval('public.id_md_parts_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.md_parts OWNER TO rodneyadler;
+
+--
+-- Name: md_properties; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.md_properties (
+    id integer DEFAULT nextval('public.id_md_properties_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.md_properties OWNER TO rodneyadler;
+
+--
+-- Name: methods; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.methods (
+    id integer DEFAULT nextval('public.id_methods_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.methods OWNER TO rodneyadler;
+
+--
+-- Name: mission_id_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.mission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mission_id_seq OWNER TO rodneyadler;
+
+--
+-- Name: modifiers; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.modifiers (
+    id integer DEFAULT nextval('public.id_modifiers_seq'::regclass) NOT NULL,
+    name_id integer,
+    property_id integer,
+    part_id integer
+);
+
+
+ALTER TABLE public.modifiers OWNER TO rodneyadler;
+
+--
+-- Name: odd_missions; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.odd_missions (
+    id integer DEFAULT nextval('public.mission_id_seq'::regclass) NOT NULL,
+    event_assignment_id integer,
+    provider_assignment_id integer,
+    outcome_name_assignment_id integer,
+    root_name character varying(10) DEFAULT 'event'::character varying NOT NULL
+);
+
+
+ALTER TABLE public.odd_missions OWNER TO rodneyadler;
+
+--
+-- Name: outcome_mission_id_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.outcome_mission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.outcome_mission_id_seq OWNER TO rodneyadler;
+
+--
+-- Name: odd_outcome_missions; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.odd_outcome_missions (
+    id integer DEFAULT nextval('public.outcome_mission_id_seq'::regclass) NOT NULL,
+    assignment_id integer,
+    mission_id integer
+);
+
+
+ALTER TABLE public.odd_outcome_missions OWNER TO rodneyadler;
+
+--
+-- Name: p_logins; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.p_logins (
+    id integer DEFAULT nextval('public.id_p_logins_seq'::regclass) NOT NULL,
+    person_id integer,
+    username character varying(50),
+    password character varying(50),
+    email character varying(50),
+    balance double precision,
+    winnings double precision,
+    provider_id integer,
+    max_bet double precision DEFAULT 0 NOT NULL,
+    occupied_funds double precision DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.p_logins OWNER TO rodneyadler;
+
+--
+-- Name: p_people; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.p_people (
+    id integer DEFAULT nextval('public.id_p_people_seq'::regclass) NOT NULL,
+    first_name character varying(30) NOT NULL,
+    last_name character varying(30) NOT NULL,
+    bank_account integer NOT NULL
+);
+
+
+ALTER TABLE public.p_people OWNER TO rodneyadler;
+
+--
+-- Name: parameter_map; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.parameter_map (
+    id integer NOT NULL,
+    parameter_id integer,
+    url_id integer
+);
+
+
+ALTER TABLE public.parameter_map OWNER TO rodneyadler;
+
+--
+-- Name: parameter_map_id_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.parameter_map_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.parameter_map_id_seq OWNER TO rodneyadler;
+
+--
+-- Name: parameter_map_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rodneyadler
+--
+
+ALTER SEQUENCE public.parameter_map_id_seq OWNED BY public.parameter_map.id;
+
+
+--
+-- Name: parameters; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.parameters (
+    id integer NOT NULL,
+    key_id integer,
+    value_id integer
+);
+
+
+ALTER TABLE public.parameters OWNER TO rodneyadler;
+
+--
+-- Name: parameters_id_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.parameters_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.parameters_id_seq OWNER TO rodneyadler;
+
+--
+-- Name: parameters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rodneyadler
+--
+
+ALTER SEQUENCE public.parameters_id_seq OWNED BY public.parameters.id;
+
+
+--
+-- Name: path_map; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.path_map (
+    id integer DEFAULT nextval('public.id_path_map_seq'::regclass) NOT NULL,
+    url_id integer,
+    part_id integer
+);
+
+
+ALTER TABLE public.path_map OWNER TO rodneyadler;
+
+--
+-- Name: path_parts; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.path_parts (
+    id integer DEFAULT nextval('public.id_path_parts_seq'::regclass) NOT NULL,
+    part_value character varying(100),
+    "position" integer DEFAULT 0 NOT NULL,
+    param boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.path_parts OWNER TO rodneyadler;
+
+--
+-- Name: paths; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.paths (
+    id integer DEFAULT nextval('public.id_paths_seq'::regclass) NOT NULL
+);
+
+
+ALTER TABLE public.paths OWNER TO rodneyadler;
+
+--
+-- Name: pr_keys; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.pr_keys (
+    id integer NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.pr_keys OWNER TO rodneyadler;
+
+--
+-- Name: pr_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.pr_keys_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pr_keys_id_seq OWNER TO rodneyadler;
+
+--
+-- Name: pr_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rodneyadler
+--
+
+ALTER SEQUENCE public.pr_keys_id_seq OWNED BY public.pr_keys.id;
+
+
+--
+-- Name: pr_values; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.pr_values (
+    id integer NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.pr_values OWNER TO rodneyadler;
+
+--
+-- Name: pr_values_id_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.pr_values_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pr_values_id_seq OWNER TO rodneyadler;
+
+--
+-- Name: pr_values_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: rodneyadler
+--
+
+ALTER SEQUENCE public.pr_values_id_seq OWNED BY public.pr_values.id;
+
+
+--
+-- Name: request_fields; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.request_fields (
+    id integer DEFAULT nextval('public.id_request_fields_seq'::regclass) NOT NULL,
+    request_id integer,
+    field_id integer
+);
+
+
+ALTER TABLE public.request_fields OWNER TO rodneyadler;
+
+--
+-- Name: request_headers; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.request_headers (
+    id integer DEFAULT nextval('public.id_request_headers_seq'::regclass) NOT NULL,
+    request_id integer,
+    header_id integer
+);
+
+
+ALTER TABLE public.request_headers OWNER TO rodneyadler;
+
+--
+-- Name: request_modifiers; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.request_modifiers (
+    id integer DEFAULT nextval('public.id_request_modifiers_seq'::regclass) NOT NULL,
+    request_id integer,
+    modifier_id integer
+);
+
+
+ALTER TABLE public.request_modifiers OWNER TO rodneyadler;
+
+--
+-- Name: requests; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.requests (
+    id integer DEFAULT nextval('public.id_requests_seq'::regclass) NOT NULL,
+    method_id integer,
+    url_id integer,
+    body_type character varying(20) DEFAULT 'html'::character varying NOT NULL
+);
+
+
+ALTER TABLE public.requests OWNER TO rodneyadler;
+
+--
+-- Name: schemes; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.schemes (
+    id integer DEFAULT nextval('public.id_schemes_seq'::regclass) NOT NULL,
+    string character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.schemes OWNER TO rodneyadler;
+
+--
+-- Name: scrape_steps; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.scrape_steps (
+    id integer DEFAULT nextval('public.id_scrape_steps_seq'::regclass) NOT NULL,
+    scrape_id integer,
+    step_id integer,
+    name character varying(30)
+);
+
+
+ALTER TABLE public.scrape_steps OWNER TO rodneyadler;
+
+--
+-- Name: scrapes; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.scrapes (
+    id integer DEFAULT nextval('public.id_scrapes_seq'::regclass) NOT NULL,
+    identifier character varying(255),
+    eye_scrape boolean DEFAULT true
+);
+
+
+ALTER TABLE public.scrapes OWNER TO rodneyadler;
+
+--
+-- Name: step_assignments; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.step_assignments (
+    id integer DEFAULT nextval('public.id_step_assignments_seq'::regclass) NOT NULL,
+    step_id integer,
+    assignment_id integer
+);
+
+
+ALTER TABLE public.step_assignments OWNER TO rodneyadler;
+
+--
+-- Name: step_expectations; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.step_expectations (
+    id integer DEFAULT nextval('public.id_step_expectations_seq'::regclass) NOT NULL,
+    step_id integer,
+    expectation_id integer
+);
+
+
+ALTER TABLE public.step_expectations OWNER TO rodneyadler;
+
+--
+-- Name: step_mission_id_seq; Type: SEQUENCE; Schema: public; Owner: rodneyadler
+--
+
+CREATE SEQUENCE public.step_mission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.step_mission_id_seq OWNER TO rodneyadler;
+
+--
+-- Name: step_odd_missions; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.step_odd_missions (
+    id integer DEFAULT nextval('public.step_mission_id_seq'::regclass) NOT NULL,
+    step_id integer,
+    mission_id integer
+);
+
+
+ALTER TABLE public.step_odd_missions OWNER TO rodneyadler;
+
+--
+-- Name: steps; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.steps (
+    id integer DEFAULT nextval('public.id_steps_seq'::regclass) NOT NULL,
+    request_id integer,
+    multi boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.steps OWNER TO rodneyadler;
+
+--
+-- Name: urls; Type: TABLE; Schema: public; Owner: rodneyadler
+--
+
+CREATE TABLE public.urls (
+    id integer DEFAULT nextval('public.id_urls_seq'::regclass) NOT NULL,
+    scheme_id integer,
+    hostname_id integer
+);
+
+
+ALTER TABLE public.urls OWNER TO rodneyadler;
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_arbitrages ALTER COLUMN id SET DEFAULT nextval('public.a_arbitrages_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_bets ALTER COLUMN id SET DEFAULT nextval('public.a_bets_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_event_outcomes ALTER COLUMN id SET DEFAULT nextval('public.a_event_outcomes_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_events ALTER COLUMN id SET DEFAULT nextval('public.a_events_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_odds ALTER COLUMN id SET DEFAULT nextval('public.a_odds_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_outcomes ALTER COLUMN id SET DEFAULT nextval('public.a_outcomes_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_providers ALTER COLUMN id SET DEFAULT nextval('public.a_providers_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameter_map ALTER COLUMN id SET DEFAULT nextval('public.parameter_map_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameters ALTER COLUMN id SET DEFAULT nextval('public.parameters_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.pr_keys ALTER COLUMN id SET DEFAULT nextval('public.pr_keys_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.pr_values ALTER COLUMN id SET DEFAULT nextval('public.pr_values_id_seq'::regclass);
+
+
+--
+-- Data for Name: a_arbitrages; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.a_arbitrages (id, identified_at, hash, completed_at, success) FROM stdin;
+3	2018-08-24 20:00:15.933177	B1WxiZ9YoJROexOh9raH8SaghGoxsA	\N	\N
+4	2018-08-24 20:00:15.944226	avBrJiPZh2C2bDXgUDcoo1ant3eHaM	\N	\N
+5	2018-08-24 20:02:30.26504	zIYqoagPUMyu5aoBLKGGh6W9TG1kWn	\N	\N
+6	2018-08-24 20:02:30.275764	XM9HR2NBLRIzpTl9G7M3kCgMMHJQBy	\N	\N
+7	2018-08-24 20:07:22.344994	k4klYUIBXWdVbvnxQHgBs9xwjQyE7h	\N	\N
+8	2018-08-24 20:07:22.355771	ER4ZT5YBTFQ9jkW2Lr7fGyNBP3sBUU	\N	\N
+9	2018-08-24 20:07:47.097741	6gqVUR1WjxmMx5cymuTa71oJPqwjzn	\N	\N
+10	2018-08-24 20:07:47.108472	FIYFoZFdD4uKRYxYJ8mnD1UuFCicvn	\N	\N
+11	2018-08-24 20:07:58.496435	ffcmMMaW2mOiVaMCkGNLFXoxDP1agO	\N	\N
+12	2018-08-24 20:07:58.507189	GCxtFCQU6i779EflVKwtBC77IFUOJt	\N	\N
+13	2018-08-24 20:08:13.703233	ZJWAUkDRX5hYS7JR8wBRS8oAZxWzD3	\N	\N
+14	2018-08-24 20:08:13.71396	PqJb9o4yzHvTAtB2pcb2sQ5niNjg5C	\N	\N
+15	2018-08-24 20:19:24.990413	v432JEfIEBo5OExT8Cn9w2JY6lirvJ	\N	\N
+16	2018-08-24 20:19:25.001676	br24KDuY2HDLNHlSW5JdlQbhZfZhcC	\N	\N
+17	2018-08-26 10:24:59.009922	8oTLcszR5X58vKB81g24iZDwpQceCa	\N	\N
+18	2018-08-26 10:25:19.606969	kraqH82kLZdH8ABKNPBzrJCokvSYvK	\N	\N
+19	2018-08-26 10:25:19.622048	TWBXCANaJtX7AG5BvmWLHL1iXvioSw	\N	\N
+20	2018-08-26 10:48:48.468245	kuWc19Y1GAp9X3M43RofoIHCqTj23y	\N	\N
+21	2018-08-26 10:48:48.480859	RDh23Uhnk2SgI6R9QiiSWnsAS1dNtT	\N	\N
+22	2018-08-26 10:50:12.907172	skAUUWnXtu77gI9a94tt3FTmfdMkgQ	\N	\N
+23	2018-08-26 10:50:12.919769	7YCWR3pjluTJGCSgoTtn5IzOECZuV6	\N	\N
+24	2018-08-26 10:51:19.252353	y37OFMWqFoV8y9K1wqD9pk3IR4wNsz	\N	\N
+25	2018-08-26 10:51:19.26446	Eu9u5LAJ2Yt12WLtlYj3xreJ5J1W2T	\N	\N
+26	2018-08-26 10:51:54.902638	pk7hnc8jAwJo8DINdEUbt79SOEnFHM	\N	\N
+27	2018-08-26 10:51:54.914763	WgRNKUXNGX8Yzc15tmh8Yp2USn4rgf	\N	\N
+28	2018-08-26 10:54:57.080392	f4EhEQl4GArOTESWkAT4VU5B9jZRPg	\N	\N
+29	2018-08-26 10:54:57.092489	PsmUZ1J48HmHZD2zKquG8riaUNxTCS	\N	\N
+30	2018-08-26 10:55:16.199182	rINbTg6UAAdb1llKZmRPJ1xJGsvZfI	\N	\N
+31	2018-08-26 10:55:16.213195	uKZw8mkcVXuFLkSIizr2zAohlDZioH	\N	\N
+32	2018-08-26 10:55:26.696012	tRmEJRZOcn33hRO6xzfiEGmHcFVZGE	\N	\N
+33	2018-08-26 10:55:26.708109	OMmSSMzF2adMkOlIgxsDgT64xL4Z68	\N	\N
+34	2018-08-26 10:55:49.355129	v4JXIjGKHNuWbowSIbXc7tZrPTiDvR	\N	\N
+35	2018-08-26 10:55:49.367326	3nKDdodc5FS37koQDzLVCxlamzeoiS	\N	\N
+36	2018-08-26 10:56:46.740828	VUwVItBhlSC8hWhLzNCc8AAzIdfrg6	\N	\N
+37	2018-08-26 10:56:46.752916	ndovI3nBDe2C2TLRuRdvtfHaQGN1fo	\N	\N
+40	2018-08-26 11:06:19.689046	AydOGqhpfEqmUuChYy4E79EnqEHFZJ	\N	\N
+41	2018-08-26 11:06:19.701596	SBymgxx4GDlKGoun6fPZp6es5t1yhJ	\N	\N
+1	2018-08-24 19:59:14.237135	5ifAe82Wr5wacUjpJLuH6WZejnM43o	2018-08-26 11:06:19.713553	t
+2	2018-08-24 19:59:41.599607	CMLdabFJic7ZrbWYkUfLj5RKgRCsqH	2018-08-26 11:06:20.715983	f
+42	2018-08-26 11:08:55.009463	T2dVH1gWe6AaFnQmroUjKDHMEMHKGc	\N	\N
+43	2018-08-26 11:08:55.024824	vCSJwukCbxfCLS8r1t6wXz8lejnlwK	\N	\N
+44	2018-08-26 11:09:05.045089	DZkKDnBIH9bV6KdxeubLKRSTXnT9Pd	\N	\N
+45	2018-08-26 11:09:38.956984	9k4zrgYPXDpFzbrrs7tojKULdzbFht	\N	\N
+47	2018-08-26 13:51:27.270278	bynSy6HCgRcqXTaUMeb58bBXqoec1C	\N	\N
+48	2018-08-26 13:51:27.28268	UpiSlsHtrkRFpuMxaiQMdw4XWE3y5I	\N	\N
+49	2018-08-26 13:53:12.660536	AI6cZXFyDmYhypLbF4nYI6UPYwAwSb	\N	\N
+50	2018-08-26 13:53:12.672942	HgU5AEbXqewIzzgcnwRGaW5l4G79Hv	\N	\N
+51	2018-08-26 13:54:11.065015	NfXaImqHqPX345zPTFaWKjrlqmiwPp	\N	\N
+52	2018-08-26 13:54:11.079932	yZjQ8B2XMpK7MzO8beWaehWmARtlXb	\N	\N
+53	2018-08-26 13:56:09.305824	A4C6AX1nzF5qvT5mTinzSEkzhyGHO5	\N	\N
+54	2018-08-26 13:56:09.318834	QJWorwv8ry6VVS66pf4XgqDE5JyAjy	\N	\N
+55	2018-08-26 13:57:09.255118	HGNeFupl7jvYV56LaTO48VLEsiehqY	\N	\N
+56	2018-08-26 13:57:09.271312	tg7MRaLoFD7jazogAYNwhEahetov2n	\N	\N
+57	2018-08-26 14:05:22.952414	6CABSW1iAItpOjAD1tgHt6USMAg6NR	\N	\N
+58	2018-08-26 14:05:22.965199	NwOUTiJFVyboxVIdLPFYV8PPTZ5n1N	\N	\N
+59	2018-08-26 14:22:38.177597	6P1Jj2ZzT21r8PzjOtJuHckBi5jhKt	\N	\N
+60	2018-08-26 14:22:38.190158	q5l53IA6HSq1Y6ZROAhECyQOrjL4Er	\N	\N
+46	2018-08-26 11:09:38.969908	xkayPqFQMTkTS2KpRxISFlawHadmGQ	2018-08-26 14:23:16.235439	f
+61	2018-08-26 14:53:09.136955	FNoYUit7RVyuIvQlwDqj4pN5OpCS51	\N	\N
+62	2018-08-26 14:53:09.148906	xgbowxQ2iXV45hVVDWualoexQvrojd	\N	\N
+63	2018-08-26 14:56:19.344936	UuWMSTER4vaxvpu2Po5DOgQMTJqQPU	\N	\N
+64	2018-08-26 14:56:25.369611	WmiklBFyI18cxAHtejTOdus579KHfB	\N	\N
+65	2018-08-26 14:58:40.530786	Q93JHiX6Sg9DZvdZtJPrr66w12OTMM	\N	\N
+66	2018-08-26 14:58:46.555501	VCIwRCYzsnH1eZSPRuEBnQxJteraDq	\N	\N
+38	2018-08-26 10:57:24.492202	45OyUyQWeZ1Swmnvs2k1qrlLtrEBho	2018-08-26 14:58:52.580102	t
+39	2018-08-26 10:57:24.505262	cP2T2NksuXEq3iXqBpMsHeyP7c6OcM	2018-08-26 14:58:52.582142	f
+\.
+
+
+--
+-- Name: a_arbitrages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.a_arbitrages_id_seq', 66, true);
+
+
+--
+-- Data for Name: a_bets; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.a_bets (id, amount, outcome_id, arbitrage_id, login_id) FROM stdin;
+112	67	365	61	1
+113	44	366	61	1
+114	67	365	63	1
+115	44	366	63	1
+116	67	365	65	1
+117	44	366	65	1
+118	45	9999	66	1
+119	40	3	66	1
+108	67	2	59	1
+109	44	1	59	1
+\.
+
+
+--
+-- Name: a_bets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.a_bets_id_seq', 119, true);
+
+
+--
+-- Data for Name: a_event_outcomes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.a_event_outcomes (id, event_id, name) FROM stdin;
+28	41	1
+26	41	2
+27	41	3
+47	48	1
+48	48	2
+49	48	3
+77	58	1
+52	49	3
+50	49	1
+51	49	2
+41	46	3
+42	46	1
+43	46	2
+32	43	3
+34	43	1
+38	45	2
+39	45	3
+40	45	1
+66	54	2
+67	54	3
+65	54	1
+29	42	2
+30	42	3
+31	42	90
+63	53	1
+64	53	2
+62	53	3
+44	47	1
+45	47	2
+46	47	3
+55	50	1
+53	50	2
+54	50	3
+35	44	1
+36	44	2
+37	44	33
+80	59	1
+81	59	2
+82	59	3
+78	58	2
+79	58	3
+70	55	1
+68	55	2
+69	55	3
+57	51	1
+58	51	2
+56	51	3
+72	56	1
+73	56	2
+71	56	3
+25	40	1
+23	40	2
+24	40	3
+76	57	1
+74	57	2
+1	1	3
+2	1	99
+33	43	6
+75	57	99
+3	4	Essendon
+9999	4	Port Adelaide
+365	1	liverpool
+366	1	arsenal
+\.
+
+
+--
+-- Name: a_event_outcomes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.a_event_outcomes_id_seq', 370, true);
+
+
+--
+-- Data for Name: a_events; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.a_events (id, name, logged_at) FROM stdin;
+4	Port Adelaide vs Essendon	2018-08-24 10:43:12.035086
+14	port adelaide vs essendon	2018-08-24 21:10:18.657574
+46	huddersfield vs cardiff	2018-08-25 02:10:17.28932
+43	bournemouth vs everton	2018-08-25 02:10:17.166868
+45	liverpool vs brighton	2018-08-25 02:10:17.244677
+52	arsenal vs west ham	2018-08-25 02:10:17.517432
+54	wolverhampton vs man city	2018-08-25 02:10:17.599141
+42	southampton vs leicester	2018-08-25 02:10:17.12609
+53	newcastle vs chelsea	2018-08-25 02:10:17.557531
+47	brighton vs fulham	2018-08-25 02:10:17.331946
+50	crystal palace vs southampton	2018-08-25 02:10:17.441225
+44	everton vs huddersfield	2018-08-25 02:10:17.209016
+59	west ham vs wolverhampton	2018-08-25 02:10:17.788253
+41	leicester vs liverpool	2018-08-25 02:10:17.088939
+48	watford vs tottenham	2018-08-25 02:10:17.366972
+58	man city vs newcastle	2018-08-25 02:10:17.754043
+55	chelsea vs bournemouth	2018-08-25 02:10:17.644785
+51	man utd vs tottenham	2018-08-25 02:10:17.476781
+56	cardiff vs arsenal	2018-08-25 02:10:17.67944
+40	fulham vs burnley	2018-08-25 02:10:17.033004
+57	watford vs crystal palace	2018-08-25 02:10:17.714073
+49	burnley vs man utd	2018-08-25 02:10:17.401971
+1	liverpool vs arsenal	2018-08-24 09:35:41.309264
+\.
+
+
+--
+-- Name: a_events_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.a_events_id_seq', 167, true);
+
+
+--
+-- Data for Name: a_odds; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.a_odds (id, logged_at, value, outcome_id, provider_id) FROM stdin;
+1923	2018-08-26 14:53:06.523429	1.56000000000000005	365	1
+1924	2018-08-26 14:53:06.5256	1.5	365	3
+1925	2018-08-26 14:53:06.527629	1.46999999999999997	365	4
+1926	2018-08-26 14:53:06.52954	1.51000000000000001	365	5
+1927	2018-08-26 14:53:06.532531	1.8600000000000001	366	1
+1928	2018-08-26 14:53:06.534484	1.79000000000000004	366	3
+1929	2018-08-26 14:53:06.536338	1.87000000000000011	366	4
+1930	2018-08-26 14:53:06.538235	1.8600000000000001	366	5
+1931	2018-08-26 14:56:16.726343	1.51000000000000001	365	5
+1932	2018-08-26 14:56:16.728874	1.56000000000000005	365	1
+1933	2018-08-26 14:56:16.731045	1.5	365	3
+1934	2018-08-26 14:56:16.733142	1.46999999999999997	365	4
+1935	2018-08-26 14:56:16.736116	1.8600000000000001	366	1
+1936	2018-08-26 14:56:16.73803	1.79000000000000004	366	3
+1937	2018-08-26 14:56:16.739996	1.87000000000000011	366	4
+1938	2018-08-26 14:56:16.742171	1.8600000000000001	366	5
+1939	2018-08-26 14:58:37.89929	1.56000000000000005	365	1
+1940	2018-08-26 14:58:37.901748	1.5	365	3
+1941	2018-08-26 14:58:37.903719	1.46999999999999997	365	4
+1942	2018-08-26 14:58:37.905658	1.51000000000000001	365	5
+1943	2018-08-26 14:58:37.908855	1.8600000000000001	366	1
+1944	2018-08-26 14:58:37.911071	1.79000000000000004	366	3
+1945	2018-08-26 14:58:37.913185	1.87000000000000011	366	4
+1946	2018-08-26 14:58:37.915182	1.8600000000000001	366	5
+1201	2018-08-26 11:12:52.577646	3.66000008583068848	27	4
+1202	2018-08-26 11:12:52.579626	4	27	109
+1203	2018-08-26 11:12:52.582802	1.64999997615814209	52	109
+1204	2018-08-26 11:12:52.586461	1.62999999523162842	52	106
+1205	2018-08-26 11:12:52.588449	1.62000000476837158	52	111
+1206	2018-08-26 11:12:52.590324	1.61000001430511475	52	107
+1207	2018-08-26 11:12:52.595235	1.66999995708465576	52	4
+1208	2018-08-26 11:12:52.602168	3	58	107
+1209	2018-08-26 11:12:52.604323	3	58	106
+1210	2018-08-26 11:12:52.607379	3	58	345
+1211	2018-08-26 11:12:52.610395	3	58	4
+1212	2018-08-26 11:12:52.613086	2.90000009536743164	58	109
+1213	2018-08-26 11:12:52.616408	2.88000011444091797	58	111
+1214	2018-08-26 11:12:52.618388	2.90000009536743164	58	110
+1215	2018-08-26 11:12:52.621175	2.59999990463256836	50	106
+1216	2018-08-26 11:12:52.623031	2.54999995231628418	50	345
+1217	2018-08-26 11:12:52.625042	2.55999994277954102	50	4
+1218	2018-08-26 11:12:52.626969	2.5	50	109
+1219	2018-08-26 11:12:52.628901	2.5	50	111
+1220	2018-08-26 11:12:52.630969	2.53999996185302734	50	110
+1221	2018-08-26 11:12:52.633058	2.61999988555908203	50	107
+1222	2018-08-26 11:12:52.636327	3.25	27	106
+1223	2018-08-26 11:12:52.638601	3.20000004768371582	27	345
+1224	2018-08-26 11:12:52.640747	3.1400001049041748	27	4
+1225	2018-08-26 11:12:52.642987	3.20000004768371582	27	109
+1226	2018-08-26 11:12:52.64623	3.20000004768371582	27	111
+1227	2018-08-26 11:12:52.648345	3.09999990463256836	27	110
+1228	2018-08-26 11:12:52.650217	3.25	27	107
+1229	2018-08-26 11:12:52.657728	10	27	109
+1230	2018-08-26 11:12:52.660469	10	27	106
+1231	2018-08-26 11:12:52.662584	9	27	111
+1232	2018-08-26 11:12:52.666813	9	27	107
+1233	2018-08-26 11:12:52.669116	8.78999996185302734	27	4
+1234	2018-08-26 11:12:52.673333	26	66	106
+1235	2018-08-26 11:12:52.676257	21	66	111
+1236	2018-08-26 11:12:52.678286	19	66	107
+1237	2018-08-26 11:12:52.680203	22.8500003814697266	66	4
+1238	2018-08-26 11:12:52.682087	26	66	109
+1239	2018-08-26 11:12:52.684911	1.09000003337860107	68	106
+1240	2018-08-26 11:12:52.686976	1.11000001430511475	68	111
+1241	2018-08-26 11:12:52.695446	1.11000001430511475	68	107
+1242	2018-08-26 11:12:52.697804	1.12999999523162842	68	4
+1243	2018-08-26 11:12:52.701053	1.10000002384185791	68	109
+1244	2018-08-26 11:12:52.70747	2.20000004768371582	41	106
+1245	2018-08-26 11:12:52.709386	2.1400001049041748	41	107
+1246	2018-08-26 11:12:52.711178	2.09999990463256836	41	111
+1247	2018-08-26 11:12:52.712938	2.04999995231628418	41	4
+1248	2018-08-26 11:12:52.71476	2.20000004768371582	41	109
+1249	2018-08-26 11:12:52.71761	3.1400001049041748	27	4
+1250	2018-08-26 11:12:52.71954	3.25	27	109
+1251	2018-08-26 11:12:52.721548	3.20000004768371582	27	106
+1252	2018-08-26 11:12:52.723675	3.25	27	107
+1253	2018-08-26 11:12:52.725674	3.25	27	111
+1254	2018-08-26 11:12:52.72886	3.40000009536743164	26	106
+1255	2018-08-26 11:12:52.731761	3.40000009536743164	26	107
+1256	2018-08-26 11:12:52.733774	3.5	26	111
+1257	2018-08-26 11:12:52.735658	3.23000001907348633	26	4
+1258	2018-08-26 11:12:52.73751	3.5	26	109
+1259	2018-08-26 11:12:52.743849	3.34999990463256836	27	106
+1260	2018-08-26 11:12:52.745714	3.29999995231628418	27	107
+1261	2018-08-26 11:12:52.74764	3.29999995231628418	27	345
+1262	2018-08-26 11:12:52.750542	3.23000001907348633	27	4
+1263	2018-08-26 11:12:52.752565	3.25	27	109
+1264	2018-08-26 11:12:52.754541	3.25	27	110
+1265	2018-08-26 11:12:52.75657	3.20000004768371582	27	111
+1266	2018-08-26 11:12:52.760338	2.90000009536743164	52	345
+1267	2018-08-26 11:12:52.764891	2.90000009536743164	52	4
+1268	2018-08-26 11:12:52.766918	2.90000009536743164	52	109
+1269	2018-08-26 11:12:52.76868	2.81999993324279785	52	110
+1270	2018-08-26 11:12:52.770644	2.88000011444091797	52	111
+1271	2018-08-26 11:12:52.772468	2.90000009536743164	52	106
+1272	2018-08-26 11:12:52.774397	3	52	107
+1273	2018-08-26 11:12:52.777246	2.61999988555908203	54	106
+1274	2018-08-26 11:12:52.779217	2.53999996185302734	54	107
+1275	2018-08-26 11:12:52.781264	2.54999995231628418	54	345
+1276	2018-08-26 11:12:52.783686	2.55999994277954102	54	4
+1277	2018-08-26 11:12:52.785878	2.5	54	109
+1278	2018-08-26 11:12:52.787899	2.51999998092651367	54	110
+1279	2018-08-26 11:12:52.791153	2.5	54	111
+1280	2018-08-26 11:12:52.798018	7	30	107
+1281	2018-08-26 11:12:52.799915	6.5	30	111
+1282	2018-08-26 11:12:52.801708	6.5	30	109
+1283	2018-08-26 11:12:52.803691	6.69999980926513672	30	4
+1284	2018-08-26 11:12:52.805509	7	30	106
+1285	2018-08-26 11:12:52.808286	4.51999998092651367	27	4
+1286	2018-08-26 11:12:52.810169	4.84999990463256836	27	106
+1287	2018-08-26 11:12:52.812105	4.75	27	107
+1288	2018-08-26 11:12:52.814132	4.5	27	111
+1289	2018-08-26 11:12:52.816019	5	27	109
+1290	2018-08-26 11:12:52.819181	1.39999997615814209	2	106
+1291	2018-08-26 11:12:52.821499	1.39999997615814209	2	107
+1292	2018-08-26 11:12:52.823589	1.44000005722045898	2	111
+1293	2018-08-26 11:12:52.82574	1.45000004768371582	2	109
+1294	2018-08-26 11:12:52.827563	1.46000003814697266	2	4
+1295	2018-08-26 11:12:52.834174	5.36999988555908203	66	4
+1296	2018-08-26 11:12:52.836389	5	66	109
+1297	2018-08-26 11:12:52.838367	5	66	110
+1298	2018-08-26 11:12:52.840345	5	66	111
+1299	2018-08-26 11:12:52.842391	5.5	66	106
+1300	2018-08-26 11:12:52.84447	5.25	66	107
+1301	2018-08-26 11:12:52.846425	5.25	66	345
+1302	2018-08-26 11:12:52.849783	3.79999995231628418	27	111
+1303	2018-08-26 11:12:52.851859	4	27	106
+1304	2018-08-26 11:12:52.853748	4	27	107
+1305	2018-08-26 11:12:52.855628	3.84999990463256836	27	345
+1306	2018-08-26 11:12:52.857512	3.84999990463256836	27	4
+1307	2018-08-26 11:12:52.859366	3.79999995231628418	27	109
+1308	2018-08-26 11:12:52.861251	3.75	27	110
+1309	2018-08-26 11:12:52.863842	1.69000005722045898	65	106
+1310	2018-08-26 11:12:52.865617	1.70000004768371582	65	107
+1311	2018-08-26 11:12:52.8675	1.70000004768371582	65	345
+1312	2018-08-26 11:12:52.869483	1.6799999475479126	65	4
+1313	2018-08-26 11:12:52.871873	1.70000004768371582	65	109
+1314	2018-08-26 11:12:52.873821	1.69000005722045898	65	110
+1315	2018-08-26 11:12:52.875739	1.66999995708465576	65	111
+1316	2018-08-26 11:12:52.883588	1.29999995231628418	65	106
+1317	2018-08-26 11:12:52.886168	1.27999997138977051	65	107
+1318	2018-08-26 11:12:52.888063	1.26999998092651367	65	109
+1319	2018-08-26 11:12:52.889864	1.29999995231628418	65	4
+1320	2018-08-26 11:12:52.891981	1.28999996185302734	65	111
+1321	2018-08-26 11:12:52.894852	5.75	27	107
+1322	2018-08-26 11:12:52.896798	6	27	109
+1323	2018-08-26 11:12:52.898821	5.75	27	4
+1324	2018-08-26 11:12:52.901657	5.5	27	111
+1325	2018-08-26 11:12:52.90393	5.25	27	106
+1326	2018-08-26 11:12:52.90702	10	35	111
+1327	2018-08-26 11:12:52.908944	10	35	106
+1328	2018-08-26 11:12:52.91123	9	35	107
+1329	2018-08-26 11:12:52.9131	10	35	109
+1330	2018-08-26 11:12:52.915218	8.78999996185302734	35	4
+1331	2018-08-26 11:12:52.922821	3.40000009536743164	27	110
+1332	2018-08-26 11:12:52.924846	3.25	27	109
+1333	2018-08-26 11:12:52.926684	3.25	27	111
+1334	2018-08-26 11:12:52.928543	3.45000004768371582	27	106
+1335	2018-08-26 11:12:52.930426	3.40000009536743164	27	107
+1336	2018-08-26 11:12:52.932439	3.32999992370605469	27	4
+1337	2018-08-26 11:12:52.934439	3.29999995231628418	27	345
+1338	2018-08-26 11:12:52.938369	4.34999990463256836	28	106
+1339	2018-08-26 11:12:52.940452	4.32999992370605469	28	107
+1340	2018-08-26 11:12:52.942367	4.32999992370605469	28	4
+1341	2018-08-26 11:12:52.944385	4.25	28	345
+1342	2018-08-26 11:12:52.94634	4.09999990463256836	28	110
+1343	2018-08-26 11:12:52.948277	4.25	28	109
+1344	2018-08-26 11:12:52.950122	4	28	111
+1345	2018-08-26 11:12:52.95293	2	26	111
+1346	2018-08-26 11:12:52.954808	1.98000001907348633	26	106
+1347	2018-08-26 11:12:52.956657	2	26	107
+1348	2018-08-26 11:12:52.958432	1.99000000953674316	26	4
+1349	2018-08-26 11:12:52.960265	2	26	345
+1350	2018-08-26 11:12:52.962073	1.95000004768371582	26	110
+1351	2018-08-26 11:12:52.963965	1.95000004768371582	26	109
+1352	2018-08-26 11:12:52.970599	1.95000004768371582	58	106
+1353	2018-08-26 11:12:52.972615	1.95000004768371582	58	109
+1354	2018-08-26 11:12:52.974704	1.89999997615814209	58	107
+1355	2018-08-26 11:12:52.976795	1.90999996662139893	58	111
+1356	2018-08-26 11:12:52.978916	1.75	58	4
+1357	2018-08-26 11:12:52.982188	3.5	27	107
+1358	2018-08-26 11:12:52.98426	3.40000009536743164	27	111
+1359	2018-08-26 11:12:52.986271	3.27999997138977051	27	4
+1360	2018-08-26 11:12:52.988044	3.5	27	106
+1361	2018-08-26 11:12:52.989926	3.5	27	109
+1362	2018-08-26 11:12:52.994902	4	32	106
+1363	2018-08-26 11:12:52.997021	4	32	109
+1364	2018-08-26 11:12:52.998957	4	32	107
+1365	2018-08-26 11:12:53.001051	4	32	111
+1366	2018-08-26 11:12:53.003255	3.75999999046325684	32	4
+1367	2018-08-26 11:15:07.474071	5	46	111
+1368	2018-08-26 11:15:07.476582	5.17999982833862305	46	4
+1369	2018-08-26 11:15:07.478444	5	46	109
+1370	2018-08-26 11:15:07.480591	5	46	106
+1371	2018-08-26 11:15:07.482634	5.25	46	107
+1372	2018-08-26 11:15:07.485468	4	27	109
+1373	2018-08-26 11:15:07.487528	3.84999990463256836	27	106
+1374	2018-08-26 11:15:07.489322	4	27	107
+1375	2018-08-26 11:15:07.493937	4	27	111
+1376	2018-08-26 11:15:07.495824	3.66000008583068848	27	4
+1377	2018-08-26 11:15:07.49863	1.64999997615814209	1	109
+1378	2018-08-26 11:15:07.500664	1.66999995708465576	1	106
+1379	2018-08-26 11:15:07.502589	1.61000001430511475	1	107
+1380	2018-08-26 11:15:07.50499	1.62000000476837158	1	111
+1381	2018-08-26 11:15:07.509827	1.63999998569488525	1	4
+1382	2018-08-26 11:15:07.517576	3.40000009536743164	27	110
+1383	2018-08-26 11:15:07.519725	3.25	27	109
+1384	2018-08-26 11:15:07.521598	3.25	27	111
+1385	2018-08-26 11:15:07.523434	3.45000004768371582	27	106
+1386	2018-08-26 11:15:07.525244	3.40000009536743164	27	107
+1387	2018-08-26 11:15:07.527056	3.32999992370605469	27	4
+1388	2018-08-26 11:15:07.528955	3.29999995231628418	27	345
+1389	2018-08-26 11:15:07.531611	4.34999990463256836	28	106
+1390	2018-08-26 11:15:07.533475	4.32999992370605469	28	107
+1391	2018-08-26 11:15:07.535468	4.32999992370605469	28	4
+1392	2018-08-26 11:15:07.537352	4.25	28	345
+1393	2018-08-26 11:15:07.539187	4.09999990463256836	28	110
+1394	2018-08-26 11:15:07.541072	4.25	28	109
+1395	2018-08-26 11:15:07.542892	4	28	111
+1396	2018-08-26 11:15:07.545603	2	26	345
+1397	2018-08-26 11:15:07.547572	1.95000004768371582	26	110
+1398	2018-08-26 11:15:07.549585	1.95000004768371582	26	109
+1399	2018-08-26 11:15:07.551537	2	26	111
+1400	2018-08-26 11:15:07.553443	1.98000001907348633	26	106
+1401	2018-08-26 11:15:07.555346	2	26	107
+1402	2018-08-26 11:15:07.557264	1.99000000953674316	26	4
+1403	2018-08-26 11:15:07.564017	2.59999990463256836	50	106
+1404	2018-08-26 11:15:07.570601	2.54999995231628418	50	345
+1405	2018-08-26 11:15:07.57274	2.55999994277954102	50	4
+1406	2018-08-26 11:15:07.574786	2.5	50	109
+1407	2018-08-26 11:15:07.576709	2.5	50	111
+1408	2018-08-26 11:15:07.578561	2.53999996185302734	50	110
+1409	2018-08-26 11:15:07.580458	2.61999988555908203	50	107
+1410	2018-08-26 11:15:07.583442	3.25	27	107
+1411	2018-08-26 11:15:07.585393	3.25	27	106
+1412	2018-08-26 11:15:07.587247	3.20000004768371582	27	345
+1413	2018-08-26 11:15:07.589182	3.1400001049041748	27	4
+1414	2018-08-26 11:15:07.591078	3.20000004768371582	27	109
+1415	2018-08-26 11:15:07.592972	3.20000004768371582	27	111
+1416	2018-08-26 11:15:07.594775	3.09999990463256836	27	110
+1417	2018-08-26 11:15:07.597379	2.90000009536743164	58	110
+1418	2018-08-26 11:15:07.599185	3	58	107
+1419	2018-08-26 11:15:07.600965	3	58	106
+1420	2018-08-26 11:15:07.602809	3	58	345
+1421	2018-08-26 11:15:07.604608	3	58	4
+1422	2018-08-26 11:15:07.606369	2.90000009536743164	58	109
+1423	2018-08-26 11:15:07.608224	2.88000011444091797	58	111
+1424	2018-08-26 11:15:07.614395	5	28	106
+1425	2018-08-26 11:15:07.616216	5.25	28	107
+1426	2018-08-26 11:15:07.618013	5.5	28	111
+1427	2018-08-26 11:15:07.619805	4.42000007629394531	28	4
+1428	2018-08-26 11:15:07.621581	5.5	28	109
+1429	2018-08-26 11:15:07.62421	3.47000002861022949	27	4
+1430	2018-08-26 11:15:07.625986	3.59999990463256836	27	109
+1431	2018-08-26 11:15:07.627917	3.70000004768371582	27	106
+1432	2018-08-26 11:15:07.629703	3.5	27	107
+1433	2018-08-26 11:15:07.631501	3.5	27	111
+1434	2018-08-26 11:15:07.634224	1.70000004768371582	54	109
+1435	2018-08-26 11:15:07.636079	1.70000004768371582	54	106
+1436	2018-08-26 11:15:07.63785	1.70000004768371582	54	107
+1437	2018-08-26 11:15:07.640131	1.66999995708465576	54	111
+1438	2018-08-26 11:15:07.64202	1.71000003814697266	54	4
+1439	2018-08-26 11:15:07.648575	1.95000004768371582	58	106
+1440	2018-08-26 11:15:07.650452	1.95000004768371582	58	109
+1441	2018-08-26 11:15:07.652308	1.89999997615814209	58	107
+1442	2018-08-26 11:15:07.654075	1.90999996662139893	58	111
+1443	2018-08-26 11:15:07.655904	1.75	58	4
+1444	2018-08-26 11:15:07.658586	3.5	27	106
+1445	2018-08-26 11:15:07.66035	3.5	27	109
+1446	2018-08-26 11:15:07.662159	3.5	27	107
+1447	2018-08-26 11:15:07.663948	3.40000009536743164	27	111
+1448	2018-08-26 11:15:07.665748	3.27999997138977051	27	4
+1449	2018-08-26 11:15:07.668599	4	32	111
+1450	2018-08-26 11:15:07.670534	3.75999999046325684	32	4
+1451	2018-08-26 11:15:07.67235	4	32	106
+1452	2018-08-26 11:15:07.674207	4	32	109
+1453	2018-08-26 11:15:07.675999	4	32	107
+1454	2018-08-26 11:15:07.682176	1.5	37	107
+1455	2018-08-26 11:15:07.684071	1.51999998092651367	37	4
+1456	2018-08-26 11:15:07.685931	1.5	37	109
+1457	2018-08-26 11:15:07.687731	1.52999997138977051	37	111
+1458	2018-08-26 11:15:07.689505	1.45000004768371582	37	106
+1459	2018-08-26 11:15:07.692193	4	27	107
+1460	2018-08-26 11:15:07.693987	3.75999999046325684	27	4
+1461	2018-08-26 11:15:07.695754	4.25	27	109
+1462	2018-08-26 11:15:07.697608	4	27	111
+1463	2018-08-26 11:15:07.699504	4.30000019073486328	27	106
+1464	2018-08-26 11:15:07.702207	7	38	109
+1465	2018-08-26 11:15:07.703983	6.5	38	111
+1466	2018-08-26 11:15:07.705891	7.34999990463256836	38	106
+1467	2018-08-26 11:15:07.707697	7	38	107
+1468	2018-08-26 11:15:07.709417	6.32000017166137695	38	4
+1469	2018-08-26 11:15:07.719219	5.36999988555908203	66	4
+1470	2018-08-26 11:15:07.721014	5	66	109
+1471	2018-08-26 11:15:07.722812	5	66	110
+1472	2018-08-26 11:15:07.727126	5	66	111
+1473	2018-08-26 11:15:07.72897	5.5	66	106
+1474	2018-08-26 11:15:07.730665	5.25	66	107
+1475	2018-08-26 11:15:07.732508	5.25	66	345
+1476	2018-08-26 11:15:07.735221	4	27	107
+1477	2018-08-26 11:15:07.737038	3.84999990463256836	27	345
+1478	2018-08-26 11:15:07.739347	3.84999990463256836	27	4
+1479	2018-08-26 11:15:07.741195	3.79999995231628418	27	109
+1480	2018-08-26 11:15:07.742991	3.75	27	110
+1481	2018-08-26 11:15:07.74478	3.79999995231628418	27	111
+1482	2018-08-26 11:15:07.746671	4	27	106
+1483	2018-08-26 11:15:07.749325	1.70000004768371582	65	345
+1484	2018-08-26 11:15:07.751116	1.6799999475479126	65	4
+1485	2018-08-26 11:15:07.752927	1.70000004768371582	65	109
+1486	2018-08-26 11:15:07.757047	1.69000005722045898	65	110
+1487	2018-08-26 11:15:07.7589	1.66999995708465576	65	111
+1488	2018-08-26 11:15:07.760632	1.69000005722045898	65	106
+1489	2018-08-26 11:15:07.762426	1.70000004768371582	65	107
+1490	2018-08-26 11:15:07.768866	3.40000009536743164	26	106
+1491	2018-08-26 11:15:07.770753	3.40000009536743164	26	107
+1492	2018-08-26 11:15:07.772657	3.5	26	111
+1493	2018-08-26 11:15:07.776952	3.23000001907348633	26	4
+1494	2018-08-26 11:15:07.778734	3.5	26	109
+1495	2018-08-26 11:15:07.781465	2.20000004768371582	41	109
+1496	2018-08-26 11:15:07.783378	2.20000004768371582	41	106
+1497	2018-08-26 11:15:07.785236	2.1400001049041748	41	107
+1498	2018-08-26 11:15:07.787101	2.09999990463256836	41	111
+1499	2018-08-26 11:15:07.788879	2.04999995231628418	41	4
+1500	2018-08-26 11:15:07.791545	3.1400001049041748	27	4
+1501	2018-08-26 11:15:07.793428	3.25	27	109
+1502	2018-08-26 11:15:07.795276	3.20000004768371582	27	106
+1503	2018-08-26 11:15:07.79707	3.25	27	107
+1504	2018-08-26 11:15:07.798857	3.25	27	111
+1505	2018-08-26 11:15:07.805093	9	35	107
+1506	2018-08-26 11:15:07.806777	10	35	109
+1507	2018-08-26 11:15:07.808781	8.78999996185302734	35	4
+1508	2018-08-26 11:15:07.810567	10	35	111
+1509	2018-08-26 11:15:07.812368	10	35	106
+1510	2018-08-26 11:15:07.815031	1.29999995231628418	65	4
+1511	2018-08-26 11:15:07.816789	1.28999996185302734	65	111
+1512	2018-08-26 11:15:07.818623	1.29999995231628418	65	106
+1513	2018-08-26 11:15:07.820357	1.27999997138977051	65	107
+1514	2018-08-26 11:15:07.82227	1.26999998092651367	65	109
+1515	2018-08-26 11:15:07.82503	5.5	27	111
+1516	2018-08-26 11:15:07.826802	5.25	27	106
+1517	2018-08-26 11:15:07.828676	5.75	27	107
+1518	2018-08-26 11:15:07.830586	6	27	109
+1519	2018-08-26 11:15:07.832362	5.75	27	4
+1520	2018-08-26 11:15:07.838637	2.5	54	111
+1521	2018-08-26 11:15:07.840439	2.61999988555908203	54	106
+1522	2018-08-26 11:15:07.842354	2.53999996185302734	54	107
+1523	2018-08-26 11:15:07.844189	2.54999995231628418	54	345
+1524	2018-08-26 11:15:07.845965	2.55999994277954102	54	4
+1525	2018-08-26 11:15:07.847681	2.5	54	109
+1526	2018-08-26 11:15:07.849622	2.51999998092651367	54	110
+1527	2018-08-26 11:15:07.852321	3.20000004768371582	27	111
+1528	2018-08-26 11:15:07.854121	3.34999990463256836	27	106
+1529	2018-08-26 11:15:07.855919	3.29999995231628418	27	107
+1530	2018-08-26 11:15:07.8577	3.29999995231628418	27	345
+1531	2018-08-26 11:15:07.859546	3.23000001907348633	27	4
+1532	2018-08-26 11:15:07.861476	3.25	27	109
+1533	2018-08-26 11:15:07.863135	3.25	27	110
+1534	2018-08-26 11:15:07.865848	2.90000009536743164	52	4
+1535	2018-08-26 11:15:07.867614	2.90000009536743164	52	109
+1536	2018-08-26 11:15:07.869439	2.81999993324279785	52	110
+1537	2018-08-26 11:15:07.871237	2.88000011444091797	52	111
+1538	2018-08-26 11:15:07.873162	2.90000009536743164	52	106
+1539	2018-08-26 11:15:07.875018	3	52	107
+1540	2018-08-26 11:15:07.876772	2.90000009536743164	52	345
+1541	2018-08-26 11:15:07.883355	2.59999990463256836	62	109
+1542	2018-08-26 11:15:07.885362	2.59999990463256836	62	107
+1543	2018-08-26 11:15:07.887244	2.55999994277954102	62	4
+1544	2018-08-26 11:15:07.889084	2.40000009536743164	62	106
+1545	2018-08-26 11:15:07.890818	2.5	62	111
+1546	2018-08-26 11:15:07.893513	3.25	27	109
+1547	2018-08-26 11:15:07.898009	3.20000004768371582	27	107
+1548	2018-08-26 11:15:07.899902	3.32999992370605469	27	4
+1549	2018-08-26 11:15:07.901758	3.25	27	106
+1550	2018-08-26 11:15:07.903582	3.25	27	111
+1551	2018-08-26 11:15:07.908815	2.79999995231628418	69	111
+1552	2018-08-26 11:15:07.910664	2.79999995231628418	69	109
+1553	2018-08-26 11:15:07.912559	2.79999995231628418	69	107
+1554	2018-08-26 11:15:07.914383	2.73000001907348633	69	4
+1555	2018-08-26 11:15:07.916208	2.95000004768371582	69	106
+1556	2018-08-26 11:15:07.922435	4.51999998092651367	27	4
+1557	2018-08-26 11:15:07.924212	4.84999990463256836	27	106
+1558	2018-08-26 11:15:07.926035	4.75	27	107
+1559	2018-08-26 11:15:07.927859	4.5	27	111
+1560	2018-08-26 11:15:07.929646	5	27	109
+1561	2018-08-26 11:15:07.932302	1.39999997615814209	2	106
+1562	2018-08-26 11:15:07.934122	1.39999997615814209	2	107
+1563	2018-08-26 11:15:07.935932	1.44000005722045898	2	111
+1564	2018-08-26 11:15:07.937723	1.45000004768371582	2	109
+1565	2018-08-26 11:15:07.939479	1.46000003814697266	2	4
+1566	2018-08-26 11:15:07.942426	6.5	30	109
+1567	2018-08-26 11:15:07.944363	6.69999980926513672	30	4
+1568	2018-08-26 11:15:07.946314	7	30	106
+1569	2018-08-26 11:15:07.948229	7	30	107
+1570	2018-08-26 11:15:07.950055	6.5	30	111
+1571	2018-08-26 11:15:07.959007	5	50	109
+1572	2018-08-26 11:15:07.960869	5	50	106
+1573	2018-08-26 11:15:07.962694	5	50	111
+1574	2018-08-26 11:15:07.96702	5	50	107
+1575	2018-08-26 11:15:07.968954	4.90000009536743164	50	4
+1576	2018-08-26 11:15:07.978355	4	27	109
+1577	2018-08-26 11:15:07.980415	4	27	106
+1578	2018-08-26 11:15:07.982424	4	27	111
+1579	2018-08-26 11:15:07.98438	4	27	107
+1580	2018-08-26 11:15:07.986202	3.66000008583068848	27	4
+1581	2018-08-26 11:15:07.98913	1.64999997615814209	52	109
+1582	2018-08-26 11:15:07.991011	1.62999999523162842	52	106
+1583	2018-08-26 11:15:07.992993	1.62000000476837158	52	111
+1584	2018-08-26 11:15:07.994948	1.61000001430511475	52	107
+1585	2018-08-26 11:15:07.996832	1.66999995708465576	52	4
+1586	2018-08-26 11:15:08.003183	1.12999999523162842	68	4
+1587	2018-08-26 11:15:08.004967	1.10000002384185791	68	109
+1588	2018-08-26 11:15:08.006806	1.09000003337860107	68	106
+1589	2018-08-26 11:15:08.008746	1.11000001430511475	68	111
+1590	2018-08-26 11:15:08.010592	1.11000001430511475	68	107
+1591	2018-08-26 11:15:08.01333	9	27	107
+1592	2018-08-26 11:15:08.015242	8.78999996185302734	27	4
+1593	2018-08-26 11:15:08.017051	10	27	109
+1594	2018-08-26 11:15:08.018917	10	27	106
+1595	2018-08-26 11:15:08.020745	9	27	111
+1596	2018-08-26 11:15:08.023743	26	66	106
+1597	2018-08-26 11:15:08.027096	21	66	111
+1598	2018-08-26 11:15:08.028962	19	66	107
+1599	2018-08-26 11:15:08.030797	22.8500003814697266	66	4
+1600	2018-08-26 11:15:08.032622	26	66	109
+1601	2018-08-26 11:15:08.041081	5.36999988555908203	66	4
+1602	2018-08-26 11:15:08.043941	5	66	109
+1603	2018-08-26 11:15:08.045825	5	66	110
+1604	2018-08-26 11:15:08.047695	5	66	111
+1605	2018-08-26 11:15:08.049576	5.5	66	106
+1606	2018-08-26 11:15:08.051467	5.25	66	107
+1607	2018-08-26 11:15:08.053243	5.25	66	345
+1608	2018-08-26 11:15:08.056107	3.79999995231628418	27	109
+1609	2018-08-26 11:15:08.058019	3.75	27	110
+1610	2018-08-26 11:15:08.060529	3.79999995231628418	27	111
+1611	2018-08-26 11:15:08.062459	4	27	106
+1612	2018-08-26 11:15:08.066275	4	27	107
+1613	2018-08-26 11:15:08.068122	3.84999990463256836	27	345
+1614	2018-08-26 11:15:08.069878	3.84999990463256836	27	4
+1615	2018-08-26 11:15:08.072706	1.6799999475479126	65	4
+1616	2018-08-26 11:15:08.076395	1.70000004768371582	65	109
+1617	2018-08-26 11:15:08.0783	1.69000005722045898	65	110
+1618	2018-08-26 11:15:08.080166	1.66999995708465576	65	111
+1619	2018-08-26 11:15:08.081992	1.69000005722045898	65	106
+1620	2018-08-26 11:15:08.083773	1.70000004768371582	65	107
+1621	2018-08-26 11:15:08.087114	1.70000004768371582	65	345
+1622	2018-08-26 11:15:08.098695	2.20000004768371582	41	109
+1623	2018-08-26 11:15:08.100554	2.20000004768371582	41	106
+1624	2018-08-26 11:15:08.102373	2.1400001049041748	41	107
+1625	2018-08-26 11:15:08.104188	2.09999990463256836	41	111
+1626	2018-08-26 11:15:08.106057	2.04999995231628418	41	4
+1627	2018-08-26 11:15:08.120901	3.25	27	111
+1628	2018-08-26 11:15:08.123207	3.1400001049041748	27	4
+1629	2018-08-26 11:15:08.125177	3.25	27	109
+1630	2018-08-26 11:15:08.1278	3.20000004768371582	27	106
+1631	2018-08-26 11:15:08.129972	3.25	27	107
+1632	2018-08-26 11:15:08.137466	3.5	26	109
+1633	2018-08-26 11:15:08.139517	3.40000009536743164	26	106
+1634	2018-08-26 11:15:08.141648	3.40000009536743164	26	107
+1635	2018-08-26 11:15:08.144073	3.5	26	111
+1636	2018-08-26 11:15:08.147403	3.23000001907348633	26	4
+1637	2018-08-26 11:15:08.156208	1.90999996662139893	58	111
+1638	2018-08-26 11:15:08.158333	1.75	58	4
+1639	2018-08-26 11:15:08.160249	1.95000004768371582	58	106
+1640	2018-08-26 11:15:08.162368	1.95000004768371582	58	109
+1641	2018-08-26 11:15:08.166039	1.89999997615814209	58	107
+1642	2018-08-26 11:15:08.168867	3.40000009536743164	27	111
+1643	2018-08-26 11:15:08.170753	3.27999997138977051	27	4
+1644	2018-08-26 11:15:08.172663	3.5	27	106
+1645	2018-08-26 11:15:08.176416	3.5	27	109
+1646	2018-08-26 11:15:08.178551	3.5	27	107
+1647	2018-08-26 11:15:08.181633	4	32	106
+1648	2018-08-26 11:15:08.183657	4	32	109
+1649	2018-08-26 11:15:08.187215	4	32	107
+1650	2018-08-26 11:15:08.189067	4	32	111
+1651	2018-08-26 11:15:08.19093	3.75999999046325684	32	4
+1652	2018-08-26 11:15:08.200083	7.34999990463256836	38	106
+1653	2018-08-26 11:15:08.202072	7	38	107
+1654	2018-08-26 11:15:08.203945	6.32000017166137695	38	4
+1655	2018-08-26 11:15:08.205811	7	38	109
+1656	2018-08-26 11:15:08.207662	6.5	38	111
+1657	2018-08-26 11:15:08.210515	1.5	37	109
+1658	2018-08-26 11:15:08.212361	1.52999997138977051	37	111
+1659	2018-08-26 11:15:08.214421	1.45000004768371582	37	106
+1660	2018-08-26 11:15:08.216381	1.5	37	107
+1661	2018-08-26 11:15:08.218323	1.51999998092651367	37	4
+1662	2018-08-26 11:15:08.221114	4.25	27	109
+1663	2018-08-26 11:15:08.223055	4	27	111
+1664	2018-08-26 11:15:08.224795	4.30000019073486328	27	106
+1665	2018-08-26 11:15:08.226616	4	27	107
+1666	2018-08-26 11:15:08.228412	3.75999999046325684	27	4
+1667	2018-08-26 11:15:08.234828	2.5	62	111
+1668	2018-08-26 11:15:08.236772	2.59999990463256836	62	109
+1669	2018-08-26 11:15:08.238642	2.59999990463256836	62	107
+1670	2018-08-26 11:15:08.24056	2.55999994277954102	62	4
+1671	2018-08-26 11:15:08.242353	2.40000009536743164	62	106
+1672	2018-08-26 11:15:08.245241	3.25	27	109
+1673	2018-08-26 11:15:08.247099	3.20000004768371582	27	107
+1674	2018-08-26 11:15:08.248901	3.32999992370605469	27	4
+1675	2018-08-26 11:15:08.250735	3.25	27	106
+1676	2018-08-26 11:15:08.252512	3.25	27	111
+1677	2018-08-26 11:15:08.255172	2.79999995231628418	69	109
+1678	2018-08-26 11:15:08.256946	2.79999995231628418	69	107
+1679	2018-08-26 11:15:08.258817	2.73000001907348633	69	4
+1680	2018-08-26 11:15:08.260668	2.95000004768371582	69	106
+1681	2018-08-26 11:15:08.262473	2.79999995231628418	69	111
+1682	2018-08-26 11:15:08.269496	4.84999990463256836	27	106
+1683	2018-08-26 11:15:08.271356	4.75	27	107
+1684	2018-08-26 11:15:08.273282	4.5	27	111
+1685	2018-08-26 11:15:08.275173	5	27	109
+1686	2018-08-26 11:15:08.277059	4.51999998092651367	27	4
+1687	2018-08-26 11:15:08.279816	1.45000004768371582	2	109
+1688	2018-08-26 11:15:08.281693	1.46000003814697266	2	4
+1689	2018-08-26 11:15:08.283562	1.39999997615814209	2	106
+1690	2018-08-26 11:15:08.287105	1.39999997615814209	2	107
+1691	2018-08-26 11:15:08.289025	1.44000005722045898	2	111
+1692	2018-08-26 11:15:08.291741	7	30	107
+1693	2018-08-26 11:15:08.293555	6.5	30	111
+1694	2018-08-26 11:15:08.297202	6.5	30	109
+1695	2018-08-26 11:15:08.299116	6.69999980926513672	30	4
+1696	2018-08-26 11:15:08.300972	7	30	106
+1697	2018-08-26 11:15:08.309297	5	50	111
+1698	2018-08-26 11:15:08.311168	5	50	107
+1699	2018-08-26 11:15:08.312968	4.90000009536743164	50	4
+1700	2018-08-26 11:15:08.314827	5	50	109
+1701	2018-08-26 11:15:08.316585	5	50	106
+1702	2018-08-26 11:15:08.319333	4	27	109
+1703	2018-08-26 11:15:08.321111	4	27	106
+1704	2018-08-26 11:15:08.323013	4	27	111
+1705	2018-08-26 11:15:08.324847	4	27	107
+1706	2018-08-26 11:15:08.326672	3.66000008583068848	27	4
+1707	2018-08-26 11:15:08.329421	1.62000000476837158	52	111
+1708	2018-08-26 11:15:08.331227	1.61000001430511475	52	107
+1709	2018-08-26 11:15:08.333114	1.66999995708465576	52	4
+1710	2018-08-26 11:15:08.334961	1.64999997615814209	52	109
+1711	2018-08-26 11:15:08.336882	1.62999999523162842	52	106
+1712	2018-08-26 11:15:08.343539	8.78999996185302734	27	4
+1713	2018-08-26 11:15:08.347219	10	27	109
+1714	2018-08-26 11:15:08.349101	10	27	106
+1715	2018-08-26 11:15:08.350972	9	27	111
+1716	2018-08-26 11:15:08.352887	9	27	107
+1717	2018-08-26 11:15:08.35642	22.8500003814697266	66	4
+1718	2018-08-26 11:15:08.358289	26	66	109
+1719	2018-08-26 11:15:08.360118	26	66	106
+1720	2018-08-26 11:15:08.361984	21	66	111
+1721	2018-08-26 11:15:08.363875	19	66	107
+1722	2018-08-26 11:15:08.366618	1.11000001430511475	68	111
+1723	2018-08-26 11:15:08.368527	1.11000001430511475	68	107
+1724	2018-08-26 11:15:08.370326	1.12999999523162842	68	4
+1725	2018-08-26 11:15:08.372233	1.10000002384185791	68	109
+1726	2018-08-26 11:15:08.374042	1.09000003337860107	68	106
+1727	2018-08-26 11:15:08.380535	10	35	109
+1728	2018-08-26 11:15:08.3824	8.78999996185302734	35	4
+1729	2018-08-26 11:15:08.384289	10	35	111
+1730	2018-08-26 11:15:08.38612	10	35	106
+1731	2018-08-26 11:15:08.387978	9	35	107
+1732	2018-08-26 11:15:08.39082	1.29999995231628418	65	4
+1733	2018-08-26 11:15:08.392757	1.28999996185302734	65	111
+1734	2018-08-26 11:15:08.398216	1.29999995231628418	65	106
+1735	2018-08-26 11:15:08.400165	1.27999997138977051	65	107
+1736	2018-08-26 11:15:08.402065	1.26999998092651367	65	109
+1737	2018-08-26 11:15:08.404929	6	27	109
+1738	2018-08-26 11:15:08.406791	5.75	27	4
+1739	2018-08-26 11:15:08.408731	5.5	27	111
+1740	2018-08-26 11:15:08.41046	5.25	27	106
+1741	2018-08-26 11:15:08.412379	5.75	27	107
+1742	2018-08-26 11:15:08.418747	2.5	54	109
+1743	2018-08-26 11:15:08.420634	2.51999998092651367	54	110
+1744	2018-08-26 11:15:08.42246	2.5	54	111
+1745	2018-08-26 11:15:08.424446	2.61999988555908203	54	106
+1746	2018-08-26 11:15:08.426339	2.53999996185302734	54	107
+1747	2018-08-26 11:15:08.428144	2.54999995231628418	54	345
+1748	2018-08-26 11:15:08.430029	2.55999994277954102	54	4
+1749	2018-08-26 11:15:08.432863	3.29999995231628418	27	107
+1750	2018-08-26 11:15:08.436242	3.29999995231628418	27	345
+1751	2018-08-26 11:15:08.438096	3.23000001907348633	27	4
+1752	2018-08-26 11:15:08.439969	3.25	27	109
+1753	2018-08-26 11:15:08.441748	3.25	27	110
+1754	2018-08-26 11:15:08.443689	3.20000004768371582	27	111
+1755	2018-08-26 11:15:08.447357	3.34999990463256836	27	106
+1756	2018-08-26 11:15:08.450167	2.90000009536743164	52	345
+1757	2018-08-26 11:15:08.451964	2.90000009536743164	52	4
+1758	2018-08-26 11:15:08.453854	2.90000009536743164	52	109
+1759	2018-08-26 11:15:08.457237	2.81999993324279785	52	110
+1760	2018-08-26 11:15:08.459035	2.88000011444091797	52	111
+1761	2018-08-26 11:15:08.460989	2.90000009536743164	52	106
+1762	2018-08-26 11:15:08.46281	3	52	107
+1763	2018-08-26 11:15:08.471462	4	27	109
+1764	2018-08-26 11:15:08.473423	3.84999990463256836	27	106
+1765	2018-08-26 11:15:08.475356	4	27	107
+1766	2018-08-26 11:15:08.477272	4	27	111
+1767	2018-08-26 11:15:08.479036	3.66000008583068848	27	4
+1768	2018-08-26 11:15:08.481963	1.64999997615814209	1	109
+1769	2018-08-26 11:15:08.483908	1.66999995708465576	1	106
+1770	2018-08-26 11:15:08.48575	1.61000001430511475	1	107
+1771	2018-08-26 11:15:08.487741	1.62000000476837158	1	111
+1772	2018-08-26 11:15:08.4896	1.63999998569488525	1	4
+1773	2018-08-26 11:15:08.492489	5	46	109
+1774	2018-08-26 11:15:08.494332	5	46	106
+1775	2018-08-26 11:15:08.496255	5.25	46	107
+1776	2018-08-26 11:15:08.498142	5	46	111
+1777	2018-08-26 11:15:08.500008	5.17999982833862305	46	4
+1778	2018-08-26 11:15:08.508175	4.32999992370605469	28	4
+1779	2018-08-26 11:15:08.509969	4.25	28	345
+1780	2018-08-26 11:15:08.511888	4.09999990463256836	28	110
+1781	2018-08-26 11:15:08.513783	4.25	28	109
+1782	2018-08-26 11:15:08.517071	4	28	111
+1783	2018-08-26 11:15:08.518844	4.34999990463256836	28	106
+1784	2018-08-26 11:15:08.520844	4.32999992370605469	28	107
+1785	2018-08-26 11:15:08.523694	1.95000004768371582	26	109
+1786	2018-08-26 11:15:08.52714	2	26	111
+1787	2018-08-26 11:15:08.529065	1.98000001907348633	26	106
+1788	2018-08-26 11:15:08.530911	2	26	107
+1789	2018-08-26 11:15:08.532815	1.99000000953674316	26	4
+1790	2018-08-26 11:15:08.536255	2	26	345
+1791	2018-08-26 11:15:08.53825	1.95000004768371582	26	110
+1792	2018-08-26 11:15:08.541074	3.45000004768371582	27	106
+1793	2018-08-26 11:15:08.542939	3.40000009536743164	27	107
+1794	2018-08-26 11:15:08.546174	3.32999992370605469	27	4
+1795	2018-08-26 11:15:08.548148	3.29999995231628418	27	345
+1796	2018-08-26 11:15:08.550034	3.40000009536743164	27	110
+1797	2018-08-26 11:15:08.551847	3.25	27	109
+1798	2018-08-26 11:15:08.553656	3.25	27	111
+1799	2018-08-26 11:15:08.562262	2.54999995231628418	50	345
+1800	2018-08-26 11:15:08.564178	2.55999994277954102	50	4
+1801	2018-08-26 11:15:08.566085	2.5	50	109
+1802	2018-08-26 11:15:08.567977	2.5	50	111
+1803	2018-08-26 11:15:08.569816	2.53999996185302734	50	110
+1804	2018-08-26 11:15:08.571721	2.61999988555908203	50	107
+1805	2018-08-26 11:15:08.583692	2.59999990463256836	50	106
+1806	2018-08-26 11:15:08.595907	3.20000004768371582	27	109
+1807	2018-08-26 11:15:08.603423	3.20000004768371582	27	111
+1808	2018-08-26 11:15:08.608555	3.09999990463256836	27	110
+1809	2018-08-26 11:15:08.610467	3.25	27	107
+1810	2018-08-26 11:15:08.612339	3.25	27	106
+1811	2018-08-26 11:15:08.614309	3.20000004768371582	27	345
+1812	2018-08-26 11:15:08.616173	3.1400001049041748	27	4
+1813	2018-08-26 11:15:08.618939	2.88000011444091797	58	111
+1814	2018-08-26 11:15:08.621026	2.90000009536743164	58	110
+1815	2018-08-26 11:15:08.622899	3	58	107
+1816	2018-08-26 11:15:08.625296	3	58	106
+1817	2018-08-26 11:15:08.627329	3	58	345
+1818	2018-08-26 11:15:08.629319	3	58	4
+1819	2018-08-26 11:15:08.631197	2.90000009536743164	58	109
+1820	2018-08-26 11:15:08.637973	5.5	28	109
+1821	2018-08-26 11:15:08.639806	5	28	106
+1822	2018-08-26 11:15:08.641836	5.25	28	107
+1823	2018-08-26 11:15:08.643728	5.5	28	111
+1824	2018-08-26 11:15:08.645496	4.42000007629394531	28	4
+1825	2018-08-26 11:15:08.648391	3.59999990463256836	27	109
+1826	2018-08-26 11:15:08.650273	3.70000004768371582	27	106
+1827	2018-08-26 11:15:08.652323	3.5	27	107
+1828	2018-08-26 11:15:08.654285	3.5	27	111
+1829	2018-08-26 11:15:08.656194	3.47000002861022949	27	4
+1830	2018-08-26 11:15:08.659377	1.70000004768371582	54	109
+1831	2018-08-26 11:15:08.661249	1.70000004768371582	54	106
+1832	2018-08-26 11:15:08.663146	1.70000004768371582	54	107
+1833	2018-08-26 11:15:08.66503	1.66999995708465576	54	111
+1834	2018-08-26 11:15:08.667053	1.71000003814697266	54	4
+1835	2018-08-26 13:51:27.25062	1.5	2	3
+1836	2018-08-26 13:51:27.252992	1.46999999999999997	2	4
+1837	2018-08-26 13:51:27.25478	1.51000000000000001	2	5
+1838	2018-08-26 13:51:27.256615	1.56000000000000005	2	1
+1839	2018-08-26 13:51:27.259353	1.8600000000000001	1	1
+1840	2018-08-26 13:51:27.261318	1.79000000000000004	1	3
+1841	2018-08-26 13:51:27.263104	1.87000000000000011	1	4
+1842	2018-08-26 13:51:27.265018	1.8600000000000001	1	5
+1843	2018-08-26 13:53:12.640648	1.56000000000000005	2	1
+1844	2018-08-26 13:53:12.642937	1.5	2	3
+1845	2018-08-26 13:53:12.644778	1.46999999999999997	2	4
+1846	2018-08-26 13:53:12.646612	1.51000000000000001	2	5
+1847	2018-08-26 13:53:12.64952	1.8600000000000001	1	1
+1848	2018-08-26 13:53:12.65137	1.79000000000000004	1	3
+1849	2018-08-26 13:53:12.653212	1.87000000000000011	1	4
+1850	2018-08-26 13:53:12.655062	1.8600000000000001	1	5
+1851	2018-08-26 13:54:11.041587	1.51000000000000001	2	5
+1852	2018-08-26 13:54:11.044057	1.56000000000000005	2	1
+1853	2018-08-26 13:54:11.046172	1.5	2	3
+1854	2018-08-26 13:54:11.050499	1.46999999999999997	2	4
+1855	2018-08-26 13:54:11.053518	1.8600000000000001	1	1
+1856	2018-08-26 13:54:11.055578	1.79000000000000004	1	3
+1857	2018-08-26 13:54:11.05769	1.87000000000000011	1	4
+1858	2018-08-26 13:54:11.059582	1.8600000000000001	1	5
+1859	2018-08-26 13:56:09.28558	1.56000000000000005	2	1
+1860	2018-08-26 13:56:09.287993	1.5	2	3
+1861	2018-08-26 13:56:09.289894	1.46999999999999997	2	4
+1862	2018-08-26 13:56:09.291762	1.51000000000000001	2	5
+1863	2018-08-26 13:56:09.294637	1.8600000000000001	1	1
+1864	2018-08-26 13:56:09.296538	1.79000000000000004	1	3
+1865	2018-08-26 13:56:09.298551	1.87000000000000011	1	4
+1866	2018-08-26 13:56:09.300332	1.8600000000000001	1	5
+1867	2018-08-26 13:57:09.233828	1.56000000000000005	2	1
+1868	2018-08-26 13:57:09.236211	1.5	2	3
+1869	2018-08-26 13:57:09.238082	1.46999999999999997	2	4
+1870	2018-08-26 13:57:09.240161	1.51000000000000001	2	5
+1871	2018-08-26 13:57:09.243587	1.8600000000000001	1	1
+1872	2018-08-26 13:57:09.245633	1.79000000000000004	1	3
+1873	2018-08-26 13:57:09.24771	1.87000000000000011	1	4
+1874	2018-08-26 13:57:09.249703	1.8600000000000001	1	5
+1875	2018-08-26 14:00:01.965552	1.56000000000000005	2	1
+1876	2018-08-26 14:00:01.967871	1.5	2	3
+1877	2018-08-26 14:00:01.969822	1.46999999999999997	2	4
+1878	2018-08-26 14:00:01.971705	1.51000000000000001	2	5
+1879	2018-08-26 14:00:01.97468	1.8600000000000001	1	1
+1880	2018-08-26 14:00:01.976807	1.79000000000000004	1	3
+1881	2018-08-26 14:00:01.978712	1.87000000000000011	1	4
+1882	2018-08-26 14:00:01.980639	1.8600000000000001	1	5
+1883	2018-08-26 14:00:47.479253	1.5	2	3
+1884	2018-08-26 14:00:47.481603	1.46999999999999997	2	4
+1885	2018-08-26 14:00:47.483547	1.51000000000000001	2	5
+1886	2018-08-26 14:00:47.485506	1.56000000000000005	2	1
+1887	2018-08-26 14:00:47.488377	1.8600000000000001	1	5
+1888	2018-08-26 14:00:47.490198	1.8600000000000001	1	1
+1889	2018-08-26 14:00:47.492165	1.79000000000000004	1	3
+1890	2018-08-26 14:00:47.493973	1.87000000000000011	1	4
+1891	2018-08-26 14:03:03.386146	1.56000000000000005	2	1
+1892	2018-08-26 14:03:03.388675	1.5	2	3
+1893	2018-08-26 14:03:03.390708	1.46999999999999997	2	4
+1894	2018-08-26 14:03:03.392899	1.51000000000000001	2	5
+1895	2018-08-26 14:03:03.396044	1.8600000000000001	1	1
+1896	2018-08-26 14:03:03.399711	1.79000000000000004	1	3
+1897	2018-08-26 14:03:03.402653	1.87000000000000011	1	4
+1898	2018-08-26 14:03:03.404675	1.8600000000000001	1	5
+1899	2018-08-26 14:04:55.410222	1.51000000000000001	2	5
+1900	2018-08-26 14:04:55.41301	1.56000000000000005	2	1
+1901	2018-08-26 14:04:55.4153	1.5	2	3
+1902	2018-08-26 14:04:55.417358	1.46999999999999997	2	4
+1903	2018-08-26 14:04:55.420265	1.8600000000000001	1	1
+1904	2018-08-26 14:04:55.422201	1.79000000000000004	1	3
+1905	2018-08-26 14:04:55.424235	1.87000000000000011	1	4
+1906	2018-08-26 14:04:55.42622	1.8600000000000001	1	5
+1907	2018-08-26 14:05:20.34237	1.56000000000000005	2	1
+1908	2018-08-26 14:05:20.344724	1.5	2	3
+1909	2018-08-26 14:05:20.346671	1.46999999999999997	2	4
+1910	2018-08-26 14:05:20.348568	1.51000000000000001	2	5
+1911	2018-08-26 14:05:20.351463	1.8600000000000001	1	1
+1912	2018-08-26 14:05:20.353452	1.79000000000000004	1	3
+1913	2018-08-26 14:05:20.355421	1.87000000000000011	1	4
+1914	2018-08-26 14:05:20.357295	1.8600000000000001	1	5
+1915	2018-08-26 14:22:35.574733	1.56000000000000005	2	1
+1916	2018-08-26 14:22:35.57707	1.5	2	3
+1917	2018-08-26 14:22:35.578889	1.46999999999999997	2	4
+1918	2018-08-26 14:22:35.580751	1.51000000000000001	2	5
+1919	2018-08-26 14:22:35.583662	1.8600000000000001	1	5
+1920	2018-08-26 14:22:35.585525	1.8600000000000001	1	1
+1921	2018-08-26 14:22:35.587545	1.79000000000000004	1	3
+1922	2018-08-26 14:22:35.58933	1.87000000000000011	1	4
+\.
+
+
+--
+-- Name: a_odds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.a_odds_id_seq', 1946, true);
+
+
+--
+-- Data for Name: a_outcomes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.a_outcomes (id, name) FROM stdin;
+6	Port Adelaide
+7	Essendon
+41	brighton
+32	southampton
+38	huddersfield
+37	everton
+62	west ham
+69	wolverhampton
+30	leicester
+66	newcastle
+68	man city
+35	bournemouth
+65	chelsea
+52	tottenham
+46	cardiff
+26	fulham
+50	watford
+58	crystal palace
+28	burnley
+27	draw
+54	man utd
+2	liverpool
+1	arsenal
+\.
+
+
+--
+-- Name: a_outcomes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.a_outcomes_id_seq', 367, true);
+
+
+--
+-- Data for Name: a_providers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.a_providers (id, name, arbitrage_count) FROM stdin;
+21	TopBetta	0
+22	BetFair	0
+23	Bet365	0
+24	Ladbrokes	0
+25	Neds	0
+18	UniBet	0
+19	PalmerBet	0
+20	MadBookie	0
+110	madbookie	0
+345	neds	0
+109	topbetta	0
+106	unibet	0
+107	bet365	0
+111	palmerbet	0
+1	ladbrokes	0
+3	snailbet	0
+4	betfair	0
+5	sportsbet	0
+\.
+
+
+--
+-- Name: a_providers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.a_providers_id_seq', 1947, true);
+
+
+--
+-- Data for Name: as_attributes; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.as_attributes (id, string) FROM stdin;
+1	value
+3	class
+328	href
+332	alt
+324	title
+2	content
+85	test2
+84	test
+193	test_mission_e
+194	test_mission_p
+195	test_mission_n
+203	test_m_o1
+204	test_m_o2
+\.
+
+
+--
+-- Data for Name: as_expectations; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.as_expectations (id, string) FROM stdin;
+2	My Account
+3	Login
+1	Log out
+42	odds.com.au - Get the best betting odds, everytime!
+48	Upcoming Markets
+45	Login to your account
+4	test
+\.
+
+
+--
+-- Data for Name: as_names; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.as_names (id, string) FROM stdin;
+2	hash
+3	foot
+4	cookie
+5	sportsbet_csrf
+6	sportsbet_logout_link
+309	url-suffix
+289	event name
+290	providers
+291	outcome name
+292	home win
+314	draw
+293	away win
+1	header
+87	test
+88	test2
+170	test_mission_e
+171	test_mission_p
+172	test_mission_n
+179	test_m_o1
+180	test_m_o2
+\.
+
+
+--
+-- Data for Name: as_selectors; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.as_selectors (id, string) FROM stdin;
+2	.lol
+3	//*[@id='firstHeading']
+4	set-cookie
+5	//form[@id='login-form']//input[@name='login_uid']
+7	//span[@id='my-account-link']
+6	//a[@title='Logout']
+329	//a[@class='header__logo']
+332	//h1[@itemprop='name']
+333	//div[@class='octd-right__header-cell']/a
+334	//div[@class='octd-left__main-row']
+335	//div[@class='octd-right__main']/*[1]//div[contains(@class, 'octd-right__odds-value')]/text()
+336	//div[@class='octd-right__main']/*[2]//div[contains(@class, 'octd-right__odds-value')]/text()
+8	//div[@id='login-btn-ctn']/a/img
+342	(//div[@id='pageContent']//tbody//table)[2]//table//table[2]//tr//td[4]//a[@target='_blank']
+340	(//table[@bgcolor='#EFEBEF'])[1]//tr[1]//td[5]/a|(//table[@bgcolor='#EFEBEF'])[1]//tr[1]//td[3]/a
+355	(//table[@bgcolor='#EFEBEF'])[1]//a[@title='Click To Compare Odds']
+356	(//td[@class='title-bar-left'])[1]
+337	//span[@id='toplinks-login']/a/img
+338	(//div[@id='pageContent']//table[@class='heading'])[1]//td[@class='title-bar-left']/text()[1]
+360	(//table[@bgcolor='#EFEBEF'])[1]//tr[1]//td[3]/a|(//table[@bgcolor='#EFEBEF'])[1]//tr[1]//td[4]/a|(//table[@bgcolor='#EFEBEF'])[1]//tr[1]//td[5]/a
+339	(//table[@bgcolor='#EFEBEF'])[1]//tr//td[2]//a[@target='_blank']
+362	(//table[@bgcolor='#EFEBEF'])[1]//tr//td[3]//a[@target='_blank']
+348	(//table[@bgcolor='#EFEBEF'])[1]//tr//td[4]//a[@target='_blank']
+1	h1
+90	test2
+89	test
+198	test_mission_e
+199	test_mission_p
+200	test_mission_n
+208	test_m_o1
+209	test_m_o2
+\.
+
+
+--
+-- Data for Name: assignments; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.assignments (id, selector_id, name_id, body, attribute_id, vital, multi, regex) FROM stdin;
+2	1	2	t	2	f	f	NO_REGEX
+3	3	1	t	1	f	f	NO_REGEX
+4	4	4	f	2	f	f	NO_REGEX
+5	5	5	t	1	t	f	NO_REGEX
+285	332	289	t	2	f	f	NO_REGEX
+286	333	290	t	328	f	t	NO_REGEX
+287	334	291	t	2	f	t	NO_REGEX
+288	335	292	t	2	f	t	NO_REGEX
+289	336	293	f	2	f	t	NO_REGEX
+294	342	293	f	2	f	t	NO_REGEX
+290	338	289	t	2	f	f	NO_REGEX
+291	339	290	t	324	f	t	NO_REGEX
+292	340	291	t	2	f	t	NO_REGEX
+300	338	289	t	2	f	f	\\s+on$
+301	339	290	t	324	f	t	[^a-zA-Z0-9_].+$
+308	360	291	t	2	f	t	NO_REGEX
+293	339	292	t	2	f	t	NO_REGEX
+310	362	314	t	2	f	t	NO_REGEX
+299	348	293	t	2	f	t	NO_REGEX
+305	355	309	t	328	f	t	^.+match-betting\\/
+1	1	1	t	2	f	f	NO_REGEX
+86	89	87	t	84	f	f	NO_REGEX
+87	90	88	f	85	t	f	NO_REGEX
+166	198	170	t	193	f	t	NO_REGEX
+167	199	171	t	194	f	f	NO_REGEX
+168	200	172	t	195	f	t	NO_REGEX
+175	208	179	t	203	f	t	NO_REGEX
+176	209	180	f	204	t	t	NO_REGEX
+\.
+
+
+--
+-- Data for Name: bd_keys; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.bd_keys (id, string) FROM stdin;
+1	appears_as_logged_out
+2	action
+3	form_name
+5	fakeusername
+7	remember_me
+8	password
+9	multi_variant_cookie_content
+10	login_uid
+6	username
+33	test
+\.
+
+
+--
+-- Data for Name: bd_values; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.bd_values (id, string) FROM stdin;
+1	1
+2	DoLogin
+3	header
+4	1534238215
+5	Enter Username
+8	Header_Trial_R19=11
+6	on
+9	--expecting--
+17	test
+\.
+
+
+--
+-- Data for Name: body_fields; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.body_fields (id, key_id, value_id) FROM stdin;
+1	1	1
+2	2	2
+3	3	3
+4	5	5
+7	7	6
+9	9	8
+8	8	9
+10	10	9
+5	6	9
+17	33	17
+\.
+
+
+--
+-- Data for Name: expectations; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.expectations (id, expectation_id, selector_id, attribute_id, body) FROM stdin;
+1	1	6	2	t
+2	2	7	2	t
+3	3	8	2	t
+42	42	329	324	t
+48	48	356	2	t
+45	45	337	332	t
+4	4	89	84	t
+\.
+
+
+--
+-- Data for Name: hd_keys; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.hd_keys (id, string) FROM stdin;
+2	pragma
+3	cookie
+4	content-type
+1	user-agent
+5	test
+\.
+
+
+--
+-- Data for Name: hd_values; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.hd_values (id, string) FROM stdin;
+1	Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36
+2	no-cache
+3	Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0 Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0.
+4	--expecting--
+5	application/x-www-form-urlencoded
+99	Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36
+105	Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1
+108	Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41
+6	test
+\.
+
+
+--
+-- Data for Name: headers; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.headers (id, key_id, value_id) FROM stdin;
+1	1	1
+2	1	3
+3	2	2
+4	3	4
+5	4	5
+99	1	99
+105	1	105
+108	1	108
+6	5	6
+\.
+
+
+--
+-- Data for Name: hostnames; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.hostnames (id, string) FROM stdin;
+2	www.sportsbet.com.au
+169	www.odds.com.au
+172	www.sportspunter.com
+1	en.wikipedia.org
+\.
+
+
+--
+-- Name: id_as_attributes_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_as_attributes_seq', 503, true);
+
+
+--
+-- Name: id_as_expectations_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_as_expectations_seq', 68, true);
+
+
+--
+-- Name: id_as_names_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_as_names_seq', 441, true);
+
+
+--
+-- Name: id_as_selectors_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_as_selectors_seq', 508, true);
+
+
+--
+-- Name: id_assignments_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_assignments_seq', 435, true);
+
+
+--
+-- Name: id_bd_keys_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_bd_keys_seq', 250, true);
+
+
+--
+-- Name: id_bd_values_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_bd_values_seq', 234, true);
+
+
+--
+-- Name: id_bodies_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_bodies_seq', 1, false);
+
+
+--
+-- Name: id_body_fields_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_body_fields_seq', 234, true);
+
+
+--
+-- Name: id_ck_names_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_ck_names_seq', 1, false);
+
+
+--
+-- Name: id_ck_values_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_ck_values_seq', 1, false);
+
+
+--
+-- Name: id_expectations_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_expectations_seq', 68, true);
+
+
+--
+-- Name: id_hd_keys_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_hd_keys_seq', 135, true);
+
+
+--
+-- Name: id_hd_values_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_hd_values_seq', 136, true);
+
+
+--
+-- Name: id_headers_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_headers_seq', 136, true);
+
+
+--
+-- Name: id_hostnames_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_hostnames_seq', 214, true);
+
+
+--
+-- Name: id_md_names_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_md_names_seq', 361, true);
+
+
+--
+-- Name: id_md_parts_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_md_parts_seq', 361, true);
+
+
+--
+-- Name: id_md_properties_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_md_properties_seq', 360, true);
+
+
+--
+-- Name: id_methods_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_methods_seq', 133, true);
+
+
+--
+-- Name: id_modifiers_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_modifiers_seq', 360, true);
+
+
+--
+-- Name: id_p_logins_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_p_logins_seq', 3, true);
+
+
+--
+-- Name: id_p_people_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_p_people_seq', 3, true);
+
+
+--
+-- Name: id_path_map_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_path_map_seq', 251, true);
+
+
+--
+-- Name: id_path_parts_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_path_parts_seq', 797, true);
+
+
+--
+-- Name: id_paths_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_paths_seq', 5, true);
+
+
+--
+-- Name: id_request_fields_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_request_fields_seq', 23, true);
+
+
+--
+-- Name: id_request_headers_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_request_headers_seq', 20, true);
+
+
+--
+-- Name: id_request_modifiers_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_request_modifiers_seq', 14, true);
+
+
+--
+-- Name: id_requests_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_requests_seq', 34, true);
+
+
+--
+-- Name: id_schemes_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_schemes_seq', 214, true);
+
+
+--
+-- Name: id_scrape_steps_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_scrape_steps_seq', 18, true);
+
+
+--
+-- Name: id_scrapes_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_scrapes_seq', 22, true);
+
+
+--
+-- Name: id_step_assignments_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_step_assignments_seq', 23, true);
+
+
+--
+-- Name: id_step_expectations_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_step_expectations_seq', 19, true);
+
+
+--
+-- Name: id_steps_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_steps_seq', 23, true);
+
+
+--
+-- Name: id_url_paths_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_url_paths_seq', 1, false);
+
+
+--
+-- Name: id_urls_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.id_urls_seq', 30, true);
+
+
+--
+-- Data for Name: md_names; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.md_names (id, string) FROM stdin;
+1	cookie
+2	Username
+4	sportsbet_csrf
+314	url-suffix
+3	Password
+73	test
+74	test2
+\.
+
+
+--
+-- Data for Name: md_parts; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.md_parts (id, string) FROM stdin;
+1	--placeholder--
+2	username
+4	login_uid
+314	5
+3	password
+73	test
+74	test2
+\.
+
+
+--
+-- Data for Name: md_properties; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.md_properties (id, string) FROM stdin;
+1	cookie
+3	header
+313	url
+2	body
+72	test
+73	test2
+\.
+
+
+--
+-- Data for Name: methods; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.methods (id, string) FROM stdin;
+2	POST
+1	GET
+\.
+
+
+--
+-- Name: mission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.mission_id_seq', 7, true);
+
+
+--
+-- Data for Name: modifiers; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.modifiers (id, name_id, property_id, part_id) FROM stdin;
+1	1	1	1
+2	2	2	2
+4	4	2	4
+313	314	313	314
+3	3	2	3
+72	73	72	73
+73	74	73	74
+\.
+
+
+--
+-- Data for Name: odd_missions; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.odd_missions (id, event_assignment_id, provider_assignment_id, outcome_name_assignment_id, root_name) FROM stdin;
+1	166	167	168	event
+2	285	286	287	event
+3	290	291	292	event
+4	290	291	292	event
+5	300	301	292	event
+6	300	301	308	event
+7	300	301	308	event
+\.
+
+
+--
+-- Data for Name: odd_outcome_missions; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.odd_outcome_missions (id, assignment_id, mission_id) FROM stdin;
+1	175	1
+2	176	1
+3	288	2
+4	289	2
+5	293	3
+6	294	3
+7	293	4
+8	299	4
+9	293	5
+10	299	5
+11	293	7
+12	310	7
+13	299	7
+\.
+
+
+--
+-- Name: outcome_mission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.outcome_mission_id_seq', 13, true);
+
+
+--
+-- Data for Name: p_logins; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.p_logins (id, person_id, username, password, email, balance, winnings, provider_id, max_bet, occupied_funds) FROM stdin;
+2	2	nerfrerky	abc123	nedfre@live.com.au	31.4499999999999993	-324.550000000000011	1	100	0
+3	3	rodneyaddsx	oQrgocQ0VW	idof@live.com.au	0	0	1	100	0
+1	1	frednerky	abc123	fredn@hotmail.com	231.560000000000002	67.3299999999999983	1	100	603
+\.
+
+
+--
+-- Data for Name: p_people; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.p_people (id, first_name, last_name, bank_account) FROM stdin;
+1	fred	nerks	421348
+2	ned	ferks	543543354
+3	rodney	adler	4234
+\.
+
+
+--
+-- Data for Name: parameter_map; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.parameter_map (id, parameter_id, url_id) FROM stdin;
+1	1	1
+\.
+
+
+--
+-- Name: parameter_map_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.parameter_map_id_seq', 1, false);
+
+
+--
+-- Data for Name: parameters; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.parameters (id, key_id, value_id) FROM stdin;
+1	1	1
+\.
+
+
+--
+-- Name: parameters_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.parameters_id_seq', 274, true);
+
+
+--
+-- Data for Name: path_map; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.path_map (id, url_id, part_id) FROM stdin;
+7	4	5
+6	4	4
+8	3	4
+57	1	9
+136	9	618
+137	9	619
+138	9	620
+139	9	621
+140	10	618
+141	10	619
+142	10	620
+143	10	621
+144	11	618
+145	11	619
+146	11	620
+147	11	621
+148	12	630
+149	12	631
+150	12	632
+151	12	633
+152	12	634
+153	12	635
+154	13	630
+155	13	631
+156	13	632
+157	13	633
+158	13	634
+159	13	641
+160	14	630
+161	14	631
+162	14	632
+163	14	633
+164	14	634
+165	14	641
+166	15	630
+167	15	649
+168	15	650
+169	15	651
+170	16	630
+171	16	649
+172	16	650
+173	16	651
+174	17	630
+175	17	649
+176	17	650
+177	17	651
+178	18	630
+179	18	649
+180	18	650
+181	18	651
+182	18	634
+183	18	665
+184	19	630
+185	19	649
+186	19	650
+187	19	651
+188	20	630
+189	20	649
+190	20	650
+191	20	651
+192	20	634
+193	20	665
+194	21	630
+195	21	649
+196	21	650
+197	21	651
+198	22	630
+199	22	649
+200	22	650
+201	22	651
+202	22	634
+203	22	665
+204	23	630
+205	23	649
+206	23	650
+207	23	651
+208	24	630
+209	24	649
+210	24	650
+211	24	651
+212	24	634
+213	24	665
+214	25	630
+215	25	649
+216	25	650
+217	25	651
+218	26	630
+219	26	649
+220	26	650
+221	26	651
+222	26	634
+223	26	665
+224	27	630
+225	27	649
+226	27	650
+227	27	651
+228	28	630
+229	28	649
+230	28	650
+231	28	651
+232	28	634
+233	28	665
+234	29	630
+235	29	649
+236	29	650
+237	29	651
+238	30	630
+239	30	649
+240	30	650
+241	30	651
+242	30	634
+243	30	665
+2	1	3
+\.
+
+
+--
+-- Data for Name: path_parts; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.path_parts (id, part_value, "position", param) FROM stdin;
+2	Roman_Catholic_Archdiocese_of_Cologne	1	f
+4	account	0	f
+5	messages?HeaderMessages	1	t
+618	sport	0	f
+619	australian-rules	1	f
+620	afl	2	f
+621	port-adelaide-vs-essendon	3	f
+635	port-adelaide-vs-essendon/	5	f
+631	aussie-rules	1	f
+632	australia	2	f
+633	afl	3	f
+641	port-adelaide-vs-essendon	5	f
+630	sports-betting	0	f
+649	soccer	1	f
+650	england	2	f
+651	premier-league	3	f
+634	match-betting	4	f
+665	event-name	5	f
+9	wiki	0	f
+3	North_Rhine-Westphalia	1	f
+\.
+
+
+--
+-- Data for Name: paths; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.paths (id) FROM stdin;
+1
+2
+3
+4
+5
+\.
+
+
+--
+-- Data for Name: pr_keys; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.pr_keys (id, string) FROM stdin;
+1	q
+\.
+
+
+--
+-- Name: pr_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.pr_keys_id_seq', 274, true);
+
+
+--
+-- Data for Name: pr_values; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.pr_values (id, string) FROM stdin;
+1	user
+\.
+
+
+--
+-- Name: pr_values_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.pr_values_id_seq', 275, true);
+
+
+--
+-- Data for Name: request_fields; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.request_fields (id, request_id, field_id) FROM stdin;
+2	3	2
+3	3	3
+4	3	4
+5	3	7
+6	3	9
+7	3	5
+8	3	8
+1	3	1
+9	3	10
+10	6	17
+12	7	17
+14	8	17
+16	9	17
+18	10	17
+20	11	17
+22	12	17
+\.
+
+
+--
+-- Data for Name: request_headers; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.request_headers (id, request_id, header_id) FROM stdin;
+1	1	1
+2	1	2
+3	3	4
+4	3	2
+5	4	4
+6	4	2
+7	3	5
+8	6	6
+10	7	6
+12	8	6
+14	9	6
+16	10	6
+18	11	6
+20	12	6
+\.
+
+
+--
+-- Data for Name: request_modifiers; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.request_modifiers (id, request_id, modifier_id) FROM stdin;
+3	3	2
+4	3	3
+5	3	4
+6	12	72
+7	12	73
+8	22	313
+9	24	313
+10	26	313
+11	28	313
+12	30	313
+13	32	313
+14	34	313
+\.
+
+
+--
+-- Data for Name: requests; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.requests (id, method_id, url_id, body_type) FROM stdin;
+1	1	1	html
+2	2	1	html
+3	2	3	html
+4	1	4	html
+5	1	5	html
+6	1	1	html
+7	1	1	html
+8	1	1	html
+9	1	1	html
+10	1	1	html
+11	1	1	html
+12	1	1	html
+13	1	9	html
+14	1	10	html
+15	1	11	html
+16	1	12	html
+17	1	13	html
+18	1	14	html
+19	1	15	html
+20	1	16	html
+21	1	17	html
+22	1	18	html
+23	1	19	html
+24	1	20	html
+25	1	21	html
+26	1	22	html
+27	1	23	html
+28	1	24	html
+29	1	25	html
+30	1	26	html
+31	1	27	html
+32	1	28	html
+33	1	29	html
+34	1	30	html
+\.
+
+
+--
+-- Data for Name: schemes; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.schemes (id, string) FROM stdin;
+1	http
+2	https
+\.
+
+
+--
+-- Data for Name: scrape_steps; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.scrape_steps (id, scrape_id, step_id, name) FROM stdin;
+1	1	1	login
+2	2	2	login
+3	3	3	login
+4	3	4	messages
+5	3	5	landing_page
+6	5	8	check
+7	9	11	check
+8	10	12	check
+9	11	13	check
+10	12	14	check
+17	21	22	landing_page
+18	21	23	collect
+\.
+
+
+--
+-- Data for Name: scrapes; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.scrapes (id, identifier, eye_scrape) FROM stdin;
+1	test/wikipedia	f
+2	ladbrokes/soccer12jan/win	f
+3	sportsbet/test/test	f
+4	test/test/test	f
+5	test/test/testx	f
+9	odds/sport/afl/test	f
+10	odds/sportspunter/afl/test	f
+11	odds/sportspunter/afl/test/revenge	f
+12	odds/sportspunter/afl/test/revenge2	f
+21	sportspunter/premier-league/upcoming	t
+\.
+
+
+--
+-- Data for Name: step_assignments; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.step_assignments (id, step_id, assignment_id) FROM stdin;
+1	1	1
+2	1	2
+3	2	3
+8	5	5
+11	8	86
+12	8	87
+13	9	86
+14	9	87
+15	10	86
+16	10	87
+17	15	305
+18	16	305
+19	17	305
+20	18	305
+21	19	305
+22	20	305
+23	22	305
+\.
+
+
+--
+-- Data for Name: step_expectations; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.step_expectations (id, step_id, expectation_id) FROM stdin;
+3	5	3
+1	3	1
+2	3	2
+4	8	4
+5	9	4
+6	10	4
+7	11	42
+8	12	45
+9	13	45
+10	14	45
+11	15	48
+12	16	48
+13	17	48
+14	18	48
+15	19	48
+16	20	48
+17	21	45
+18	22	48
+19	23	45
+\.
+
+
+--
+-- Name: step_mission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: rodneyadler
+--
+
+SELECT pg_catalog.setval('public.step_mission_id_seq', 6, true);
+
+
+--
+-- Data for Name: step_odd_missions; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.step_odd_missions (id, step_id, mission_id) FROM stdin;
+1	10	1
+2	11	2
+3	12	3
+4	13	4
+5	14	5
+6	23	7
+\.
+
+
+--
+-- Data for Name: steps; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.steps (id, request_id, multi) FROM stdin;
+1	1	f
+2	1	f
+3	3	f
+4	4	f
+5	5	f
+6	12	f
+7	12	f
+8	12	f
+9	12	f
+10	12	f
+11	15	f
+12	16	f
+13	17	f
+14	18	f
+15	21	f
+17	25	f
+18	27	f
+19	29	f
+20	31	f
+21	32	t
+22	33	f
+23	34	t
+16	23	t
+\.
+
+
+--
+-- Data for Name: urls; Type: TABLE DATA; Schema: public; Owner: rodneyadler
+--
+
+COPY public.urls (id, scheme_id, hostname_id) FROM stdin;
+1	2	1
+3	2	2
+4	2	2
+5	2	2
+9	2	169
+10	2	169
+11	2	169
+12	1	172
+13	1	172
+14	1	172
+15	1	172
+16	1	172
+17	1	172
+18	1	172
+19	1	172
+20	1	172
+21	1	172
+22	1	172
+23	1	172
+24	1	172
+25	1	172
+26	1	172
+27	1	172
+28	1	172
+29	1	172
+30	1	172
+\.
+
+
+--
+-- Name: a_arbitrage_outcomes_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_bets
+    ADD CONSTRAINT a_arbitrage_outcomes_must_be_unique UNIQUE (outcome_id, arbitrage_id);
+
+
+--
+-- Name: a_arbitrages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_arbitrages
+    ADD CONSTRAINT a_arbitrages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: a_bets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_bets
+    ADD CONSTRAINT a_bets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: a_event_outcomes_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_event_outcomes
+    ADD CONSTRAINT a_event_outcomes_must_be_unique UNIQUE (event_id, name);
+
+
+--
+-- Name: a_event_outcomes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_event_outcomes
+    ADD CONSTRAINT a_event_outcomes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: a_events_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_events
+    ADD CONSTRAINT a_events_must_be_unique UNIQUE (name);
+
+
+--
+-- Name: a_events_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_events
+    ADD CONSTRAINT a_events_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: a_odds_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_odds
+    ADD CONSTRAINT a_odds_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: a_outcomes_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_outcomes
+    ADD CONSTRAINT a_outcomes_must_be_unique UNIQUE (name);
+
+
+--
+-- Name: a_outcomes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_outcomes
+    ADD CONSTRAINT a_outcomes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: a_providers_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_providers
+    ADD CONSTRAINT a_providers_must_be_unique UNIQUE (name);
+
+
+--
+-- Name: a_providers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_providers
+    ADD CONSTRAINT a_providers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: as_attributes_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.as_attributes
+    ADD CONSTRAINT as_attributes_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: as_attributes_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.as_attributes
+    ADD CONSTRAINT as_attributes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: as_expectations_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.as_expectations
+    ADD CONSTRAINT as_expectations_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: as_expectations_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.as_expectations
+    ADD CONSTRAINT as_expectations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: as_names_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.as_names
+    ADD CONSTRAINT as_names_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: as_names_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.as_names
+    ADD CONSTRAINT as_names_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: as_selectors_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.as_selectors
+    ADD CONSTRAINT as_selectors_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: as_selectors_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.as_selectors
+    ADD CONSTRAINT as_selectors_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: assignments_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.assignments
+    ADD CONSTRAINT assignments_must_be_unique UNIQUE (selector_id, name_id, body, attribute_id, vital, multi, regex);
+
+
+--
+-- Name: assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.assignments
+    ADD CONSTRAINT assignments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bank_account_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.p_people
+    ADD CONSTRAINT bank_account_must_be_unique UNIQUE (bank_account);
+
+
+--
+-- Name: bd_keys_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.bd_keys
+    ADD CONSTRAINT bd_keys_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: bd_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.bd_keys
+    ADD CONSTRAINT bd_keys_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bd_values_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.bd_values
+    ADD CONSTRAINT bd_values_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: bd_values_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.bd_values
+    ADD CONSTRAINT bd_values_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bodies_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.body_fields
+    ADD CONSTRAINT bodies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: body_fields_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.body_fields
+    ADD CONSTRAINT body_fields_must_be_unique UNIQUE (key_id, value_id);
+
+
+--
+-- Name: expectations_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.expectations
+    ADD CONSTRAINT expectations_must_be_unique UNIQUE (expectation_id, selector_id, attribute_id, body);
+
+
+--
+-- Name: expectations_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.expectations
+    ADD CONSTRAINT expectations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hd_keys_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.hd_keys
+    ADD CONSTRAINT hd_keys_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: hd_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.hd_keys
+    ADD CONSTRAINT hd_keys_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hd_values_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.hd_values
+    ADD CONSTRAINT hd_values_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: hd_values_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.hd_values
+    ADD CONSTRAINT hd_values_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: headers_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.headers
+    ADD CONSTRAINT headers_must_be_unique UNIQUE (key_id, value_id);
+
+
+--
+-- Name: headers_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.headers
+    ADD CONSTRAINT headers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hostnames_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.hostnames
+    ADD CONSTRAINT hostnames_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: hostnames_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.hostnames
+    ADD CONSTRAINT hostnames_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: md_names_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.md_names
+    ADD CONSTRAINT md_names_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: md_names_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.md_names
+    ADD CONSTRAINT md_names_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: md_parts_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.md_parts
+    ADD CONSTRAINT md_parts_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: md_parts_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.md_parts
+    ADD CONSTRAINT md_parts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: md_properties_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.md_properties
+    ADD CONSTRAINT md_properties_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: md_properties_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.md_properties
+    ADD CONSTRAINT md_properties_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: methods_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.methods
+    ADD CONSTRAINT methods_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: methods_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.methods
+    ADD CONSTRAINT methods_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: modifiers_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.modifiers
+    ADD CONSTRAINT modifiers_must_be_unique UNIQUE (name_id, property_id, part_id);
+
+
+--
+-- Name: modifiers_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.modifiers
+    ADD CONSTRAINT modifiers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: odd_missions_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.odd_missions
+    ADD CONSTRAINT odd_missions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: odd_outcome_missions_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.odd_outcome_missions
+    ADD CONSTRAINT odd_outcome_missions_must_be_unique UNIQUE (assignment_id, mission_id);
+
+
+--
+-- Name: odd_outcome_missions_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.odd_outcome_missions
+    ADD CONSTRAINT odd_outcome_missions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: p_logins_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.p_logins
+    ADD CONSTRAINT p_logins_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: p_people_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.p_people
+    ADD CONSTRAINT p_people_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: parameter_map_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameter_map
+    ADD CONSTRAINT parameter_map_must_be_unique UNIQUE (parameter_id, url_id);
+
+
+--
+-- Name: parameter_map_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameter_map
+    ADD CONSTRAINT parameter_map_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: parameters_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameters
+    ADD CONSTRAINT parameters_must_be_unique UNIQUE (key_id, value_id);
+
+
+--
+-- Name: parameters_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameters
+    ADD CONSTRAINT parameters_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: path_map_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.path_map
+    ADD CONSTRAINT path_map_must_be_unique UNIQUE (url_id, part_id);
+
+
+--
+-- Name: path_map_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.path_map
+    ADD CONSTRAINT path_map_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: path_parts_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.path_parts
+    ADD CONSTRAINT path_parts_must_be_unique UNIQUE (part_value, "position", param);
+
+
+--
+-- Name: path_parts_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.path_parts
+    ADD CONSTRAINT path_parts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: paths_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.paths
+    ADD CONSTRAINT paths_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: people_bank_account_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.p_people
+    ADD CONSTRAINT people_bank_account_must_be_unique UNIQUE (bank_account);
+
+
+--
+-- Name: pr_keys_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.pr_keys
+    ADD CONSTRAINT pr_keys_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: pr_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.pr_keys
+    ADD CONSTRAINT pr_keys_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pr_values_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.pr_values
+    ADD CONSTRAINT pr_values_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: pr_values_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.pr_values
+    ADD CONSTRAINT pr_values_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: request_fields_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_fields
+    ADD CONSTRAINT request_fields_must_be_unique UNIQUE (request_id, field_id);
+
+
+--
+-- Name: request_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_fields
+    ADD CONSTRAINT request_fields_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: request_headers_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_headers
+    ADD CONSTRAINT request_headers_must_be_unique UNIQUE (request_id, header_id);
+
+
+--
+-- Name: request_headers_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_headers
+    ADD CONSTRAINT request_headers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: request_modifiers_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_modifiers
+    ADD CONSTRAINT request_modifiers_must_be_unique UNIQUE (request_id, modifier_id);
+
+
+--
+-- Name: request_modifiers_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_modifiers
+    ADD CONSTRAINT request_modifiers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: requests_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.requests
+    ADD CONSTRAINT requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schemes_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.schemes
+    ADD CONSTRAINT schemes_must_be_unique UNIQUE (string);
+
+
+--
+-- Name: schemes_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.schemes
+    ADD CONSTRAINT schemes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: scrape_steps_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.scrape_steps
+    ADD CONSTRAINT scrape_steps_must_be_unique UNIQUE (scrape_id, step_id, name);
+
+
+--
+-- Name: scrape_steps_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.scrape_steps
+    ADD CONSTRAINT scrape_steps_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: scrapes_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.scrapes
+    ADD CONSTRAINT scrapes_must_be_unique UNIQUE (identifier, eye_scrape);
+
+
+--
+-- Name: scrapes_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.scrapes
+    ADD CONSTRAINT scrapes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: step_assignments_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_assignments
+    ADD CONSTRAINT step_assignments_must_be_unique UNIQUE (step_id, assignment_id);
+
+
+--
+-- Name: step_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_assignments
+    ADD CONSTRAINT step_assignments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: step_expectations_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_expectations
+    ADD CONSTRAINT step_expectations_must_be_unique UNIQUE (expectation_id, step_id);
+
+
+--
+-- Name: step_expectations_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_expectations
+    ADD CONSTRAINT step_expectations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: step_odd_missions_must_be_unique; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_odd_missions
+    ADD CONSTRAINT step_odd_missions_must_be_unique UNIQUE (step_id, mission_id);
+
+
+--
+-- Name: step_odd_missions_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_odd_missions
+    ADD CONSTRAINT step_odd_missions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: steps_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.steps
+    ADD CONSTRAINT steps_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: urls_pkey; Type: CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.urls
+    ADD CONSTRAINT urls_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hash_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX hash_idx ON public.a_arbitrages USING btree (hash);
+
+
+--
+-- Name: identifier_idx; Type: INDEX; Schema: public; Owner: rodneyadler
+--
+
+CREATE UNIQUE INDEX identifier_idx ON public.scrapes USING btree (identifier);
+
+
+--
+-- Name: identifier_index; Type: INDEX; Schema: public; Owner: rodneyadler
+--
+
+CREATE UNIQUE INDEX identifier_index ON public.scrapes USING btree (identifier);
+
+
+--
+-- Name: a_bets_arbitrage_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_bets
+    ADD CONSTRAINT a_bets_arbitrage_id_fkey FOREIGN KEY (arbitrage_id) REFERENCES public.a_arbitrages(id);
+
+
+--
+-- Name: a_bets_outcome_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_bets
+    ADD CONSTRAINT a_bets_outcome_id_fkey FOREIGN KEY (outcome_id) REFERENCES public.a_event_outcomes(id);
+
+
+--
+-- Name: a_event_outcomes_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_event_outcomes
+    ADD CONSTRAINT a_event_outcomes_event_id_fkey FOREIGN KEY (event_id) REFERENCES public.a_events(id);
+
+
+--
+-- Name: a_odds_outcome_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_odds
+    ADD CONSTRAINT a_odds_outcome_id_fkey FOREIGN KEY (outcome_id) REFERENCES public.a_event_outcomes(id);
+
+
+--
+-- Name: a_odds_provider_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_odds
+    ADD CONSTRAINT a_odds_provider_id_fkey FOREIGN KEY (provider_id) REFERENCES public.a_providers(id);
+
+
+--
+-- Name: assignment_attribute; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.assignments
+    ADD CONSTRAINT assignment_attribute FOREIGN KEY (attribute_id) REFERENCES public.as_attributes(id);
+
+
+--
+-- Name: assignments_name_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.assignments
+    ADD CONSTRAINT assignments_name_id_fkey FOREIGN KEY (name_id) REFERENCES public.as_names(id);
+
+
+--
+-- Name: assignments_selector_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.assignments
+    ADD CONSTRAINT assignments_selector_id_fkey FOREIGN KEY (selector_id) REFERENCES public.as_selectors(id);
+
+
+--
+-- Name: bets_logins_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.a_bets
+    ADD CONSTRAINT bets_logins_fkey FOREIGN KEY (login_id) REFERENCES public.p_logins(id);
+
+
+--
+-- Name: bodies_key_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.body_fields
+    ADD CONSTRAINT bodies_key_id_fkey FOREIGN KEY (key_id) REFERENCES public.bd_keys(id);
+
+
+--
+-- Name: bodies_value_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.body_fields
+    ADD CONSTRAINT bodies_value_id_fkey FOREIGN KEY (value_id) REFERENCES public.bd_values(id);
+
+
+--
+-- Name: expectations_attribute_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.expectations
+    ADD CONSTRAINT expectations_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES public.as_attributes(id);
+
+
+--
+-- Name: expectations_expectation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.expectations
+    ADD CONSTRAINT expectations_expectation_id_fkey FOREIGN KEY (expectation_id) REFERENCES public.as_expectations(id);
+
+
+--
+-- Name: expectations_selector_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.expectations
+    ADD CONSTRAINT expectations_selector_id_fkey FOREIGN KEY (selector_id) REFERENCES public.as_selectors(id);
+
+
+--
+-- Name: fk_url_id; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.path_map
+    ADD CONSTRAINT fk_url_id FOREIGN KEY (url_id) REFERENCES public.urls(id);
+
+
+--
+-- Name: headers_key_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.headers
+    ADD CONSTRAINT headers_key_id_fkey FOREIGN KEY (key_id) REFERENCES public.hd_keys(id);
+
+
+--
+-- Name: headers_value_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.headers
+    ADD CONSTRAINT headers_value_id_fkey FOREIGN KEY (value_id) REFERENCES public.hd_values(id);
+
+
+--
+-- Name: login_provider_fk; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.p_logins
+    ADD CONSTRAINT login_provider_fk FOREIGN KEY (provider_id) REFERENCES public.a_providers(id);
+
+
+--
+-- Name: modifiers_name_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.modifiers
+    ADD CONSTRAINT modifiers_name_id_fkey FOREIGN KEY (name_id) REFERENCES public.md_names(id);
+
+
+--
+-- Name: modifiers_part_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.modifiers
+    ADD CONSTRAINT modifiers_part_id_fkey FOREIGN KEY (part_id) REFERENCES public.md_parts(id);
+
+
+--
+-- Name: modifiers_property_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.modifiers
+    ADD CONSTRAINT modifiers_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.md_properties(id);
+
+
+--
+-- Name: odd_missions_event_assignment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.odd_missions
+    ADD CONSTRAINT odd_missions_event_assignment_id_fkey FOREIGN KEY (event_assignment_id) REFERENCES public.assignments(id);
+
+
+--
+-- Name: odd_missions_outcome_name_assignment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.odd_missions
+    ADD CONSTRAINT odd_missions_outcome_name_assignment_id_fkey FOREIGN KEY (outcome_name_assignment_id) REFERENCES public.assignments(id);
+
+
+--
+-- Name: odd_missions_provider_assignment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.odd_missions
+    ADD CONSTRAINT odd_missions_provider_assignment_id_fkey FOREIGN KEY (provider_assignment_id) REFERENCES public.assignments(id);
+
+
+--
+-- Name: odd_outcome_missions_assignment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.odd_outcome_missions
+    ADD CONSTRAINT odd_outcome_missions_assignment_id_fkey FOREIGN KEY (assignment_id) REFERENCES public.assignments(id);
+
+
+--
+-- Name: odd_outcome_missions_mission_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.odd_outcome_missions
+    ADD CONSTRAINT odd_outcome_missions_mission_id_fkey FOREIGN KEY (mission_id) REFERENCES public.odd_missions(id);
+
+
+--
+-- Name: p_logins_person_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.p_logins
+    ADD CONSTRAINT p_logins_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.p_people(id);
+
+
+--
+-- Name: parameter_map_parameter_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameter_map
+    ADD CONSTRAINT parameter_map_parameter_id_fkey FOREIGN KEY (parameter_id) REFERENCES public.parameters(id);
+
+
+--
+-- Name: parameter_map_url_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameter_map
+    ADD CONSTRAINT parameter_map_url_id_fkey FOREIGN KEY (url_id) REFERENCES public.urls(id);
+
+
+--
+-- Name: parameters_key_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameters
+    ADD CONSTRAINT parameters_key_id_fkey FOREIGN KEY (key_id) REFERENCES public.pr_keys(id);
+
+
+--
+-- Name: parameters_value_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.parameters
+    ADD CONSTRAINT parameters_value_id_fkey FOREIGN KEY (value_id) REFERENCES public.pr_values(id);
+
+
+--
+-- Name: path_map_part_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.path_map
+    ADD CONSTRAINT path_map_part_id_fkey FOREIGN KEY (part_id) REFERENCES public.path_parts(id);
+
+
+--
+-- Name: request_fields_body_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_fields
+    ADD CONSTRAINT request_fields_body_id_fkey FOREIGN KEY (field_id) REFERENCES public.body_fields(id);
+
+
+--
+-- Name: request_fields_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_fields
+    ADD CONSTRAINT request_fields_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.requests(id);
+
+
+--
+-- Name: request_headers_header_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_headers
+    ADD CONSTRAINT request_headers_header_id_fkey FOREIGN KEY (header_id) REFERENCES public.headers(id);
+
+
+--
+-- Name: request_headers_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_headers
+    ADD CONSTRAINT request_headers_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.requests(id);
+
+
+--
+-- Name: request_modifiers_modifier_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_modifiers
+    ADD CONSTRAINT request_modifiers_modifier_id_fkey FOREIGN KEY (modifier_id) REFERENCES public.modifiers(id);
+
+
+--
+-- Name: request_modifiers_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.request_modifiers
+    ADD CONSTRAINT request_modifiers_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.requests(id);
+
+
+--
+-- Name: requests_method_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.requests
+    ADD CONSTRAINT requests_method_id_fkey FOREIGN KEY (method_id) REFERENCES public.methods(id);
+
+
+--
+-- Name: requests_url_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.requests
+    ADD CONSTRAINT requests_url_id_fkey FOREIGN KEY (url_id) REFERENCES public.urls(id);
+
+
+--
+-- Name: scrape_steps_scrape_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.scrape_steps
+    ADD CONSTRAINT scrape_steps_scrape_id_fkey FOREIGN KEY (scrape_id) REFERENCES public.scrapes(id);
+
+
+--
+-- Name: scrape_steps_step_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.scrape_steps
+    ADD CONSTRAINT scrape_steps_step_id_fkey FOREIGN KEY (step_id) REFERENCES public.steps(id);
+
+
+--
+-- Name: step_assignments_assignment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_assignments
+    ADD CONSTRAINT step_assignments_assignment_id_fkey FOREIGN KEY (assignment_id) REFERENCES public.assignments(id);
+
+
+--
+-- Name: step_assignments_step_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_assignments
+    ADD CONSTRAINT step_assignments_step_id_fkey FOREIGN KEY (step_id) REFERENCES public.steps(id);
+
+
+--
+-- Name: step_expectations_expectation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_expectations
+    ADD CONSTRAINT step_expectations_expectation_id_fkey FOREIGN KEY (expectation_id) REFERENCES public.expectations(id);
+
+
+--
+-- Name: step_expectations_step_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_expectations
+    ADD CONSTRAINT step_expectations_step_id_fkey FOREIGN KEY (step_id) REFERENCES public.steps(id);
+
+
+--
+-- Name: step_odd_missions_mission_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_odd_missions
+    ADD CONSTRAINT step_odd_missions_mission_id_fkey FOREIGN KEY (mission_id) REFERENCES public.odd_missions(id);
+
+
+--
+-- Name: step_odd_missions_step_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.step_odd_missions
+    ADD CONSTRAINT step_odd_missions_step_id_fkey FOREIGN KEY (step_id) REFERENCES public.steps(id);
+
+
+--
+-- Name: steps_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.steps
+    ADD CONSTRAINT steps_request_id_fkey FOREIGN KEY (request_id) REFERENCES public.requests(id);
+
+
+--
+-- Name: urls_hostname_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.urls
+    ADD CONSTRAINT urls_hostname_id_fkey FOREIGN KEY (hostname_id) REFERENCES public.hostnames(id);
+
+
+--
+-- Name: urls_scheme_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: rodneyadler
+--
+
+ALTER TABLE ONLY public.urls
+    ADD CONSTRAINT urls_scheme_id_fkey FOREIGN KEY (scheme_id) REFERENCES public.schemes(id);
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- Name: TABLE as_attributes; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.as_attributes FROM PUBLIC;
+REVOKE ALL ON TABLE public.as_attributes FROM rodneyadler;
+GRANT ALL ON TABLE public.as_attributes TO rodneyadler;
+GRANT ALL ON TABLE public.as_attributes TO postgres;
+
+
+--
+-- Name: TABLE as_expectations; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.as_expectations FROM PUBLIC;
+REVOKE ALL ON TABLE public.as_expectations FROM rodneyadler;
+GRANT ALL ON TABLE public.as_expectations TO rodneyadler;
+GRANT ALL ON TABLE public.as_expectations TO postgres;
+
+
+--
+-- Name: TABLE as_names; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.as_names FROM PUBLIC;
+REVOKE ALL ON TABLE public.as_names FROM rodneyadler;
+GRANT ALL ON TABLE public.as_names TO rodneyadler;
+
+
+--
+-- Name: TABLE as_selectors; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.as_selectors FROM PUBLIC;
+REVOKE ALL ON TABLE public.as_selectors FROM rodneyadler;
+GRANT ALL ON TABLE public.as_selectors TO rodneyadler;
+
+
+--
+-- Name: TABLE assignments; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.assignments FROM PUBLIC;
+REVOKE ALL ON TABLE public.assignments FROM rodneyadler;
+GRANT ALL ON TABLE public.assignments TO rodneyadler;
+
+
+--
+-- Name: TABLE bd_keys; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.bd_keys FROM PUBLIC;
+REVOKE ALL ON TABLE public.bd_keys FROM rodneyadler;
+GRANT ALL ON TABLE public.bd_keys TO rodneyadler;
+
+
+--
+-- Name: TABLE bd_values; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.bd_values FROM PUBLIC;
+REVOKE ALL ON TABLE public.bd_values FROM rodneyadler;
+GRANT ALL ON TABLE public.bd_values TO rodneyadler;
+
+
+--
+-- Name: TABLE body_fields; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.body_fields FROM PUBLIC;
+REVOKE ALL ON TABLE public.body_fields FROM rodneyadler;
+GRANT ALL ON TABLE public.body_fields TO rodneyadler;
+
+
+--
+-- Name: TABLE expectations; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.expectations FROM PUBLIC;
+REVOKE ALL ON TABLE public.expectations FROM rodneyadler;
+GRANT ALL ON TABLE public.expectations TO rodneyadler;
+
+
+--
+-- Name: TABLE hd_keys; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.hd_keys FROM PUBLIC;
+REVOKE ALL ON TABLE public.hd_keys FROM rodneyadler;
+GRANT ALL ON TABLE public.hd_keys TO rodneyadler;
+
+
+--
+-- Name: TABLE hd_values; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.hd_values FROM PUBLIC;
+REVOKE ALL ON TABLE public.hd_values FROM rodneyadler;
+GRANT ALL ON TABLE public.hd_values TO rodneyadler;
+
+
+--
+-- Name: TABLE headers; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.headers FROM PUBLIC;
+REVOKE ALL ON TABLE public.headers FROM rodneyadler;
+GRANT ALL ON TABLE public.headers TO rodneyadler;
+
+
+--
+-- Name: TABLE hostnames; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.hostnames FROM PUBLIC;
+REVOKE ALL ON TABLE public.hostnames FROM rodneyadler;
+GRANT ALL ON TABLE public.hostnames TO rodneyadler;
+
+
+--
+-- Name: TABLE md_names; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.md_names FROM PUBLIC;
+REVOKE ALL ON TABLE public.md_names FROM rodneyadler;
+GRANT ALL ON TABLE public.md_names TO rodneyadler;
+
+
+--
+-- Name: TABLE md_parts; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.md_parts FROM PUBLIC;
+REVOKE ALL ON TABLE public.md_parts FROM rodneyadler;
+GRANT ALL ON TABLE public.md_parts TO rodneyadler;
+
+
+--
+-- Name: TABLE md_properties; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.md_properties FROM PUBLIC;
+REVOKE ALL ON TABLE public.md_properties FROM rodneyadler;
+GRANT ALL ON TABLE public.md_properties TO rodneyadler;
+
+
+--
+-- Name: TABLE methods; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.methods FROM PUBLIC;
+REVOKE ALL ON TABLE public.methods FROM rodneyadler;
+GRANT ALL ON TABLE public.methods TO rodneyadler;
+
+
+--
+-- Name: TABLE modifiers; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.modifiers FROM PUBLIC;
+REVOKE ALL ON TABLE public.modifiers FROM rodneyadler;
+GRANT ALL ON TABLE public.modifiers TO rodneyadler;
+
+
+--
+-- Name: TABLE odd_missions; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.odd_missions FROM PUBLIC;
+REVOKE ALL ON TABLE public.odd_missions FROM rodneyadler;
+GRANT ALL ON TABLE public.odd_missions TO rodneyadler;
+
+
+--
+-- Name: TABLE odd_outcome_missions; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.odd_outcome_missions FROM PUBLIC;
+REVOKE ALL ON TABLE public.odd_outcome_missions FROM rodneyadler;
+GRANT ALL ON TABLE public.odd_outcome_missions TO rodneyadler;
+
+
+--
+-- Name: TABLE p_logins; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.p_logins FROM PUBLIC;
+REVOKE ALL ON TABLE public.p_logins FROM rodneyadler;
+GRANT ALL ON TABLE public.p_logins TO rodneyadler;
+
+
+--
+-- Name: TABLE p_people; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.p_people FROM PUBLIC;
+REVOKE ALL ON TABLE public.p_people FROM rodneyadler;
+GRANT ALL ON TABLE public.p_people TO rodneyadler;
+
+
+--
+-- Name: TABLE parameter_map; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.parameter_map FROM PUBLIC;
+REVOKE ALL ON TABLE public.parameter_map FROM rodneyadler;
+GRANT ALL ON TABLE public.parameter_map TO rodneyadler;
+
+
+--
+-- Name: TABLE parameters; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.parameters FROM PUBLIC;
+REVOKE ALL ON TABLE public.parameters FROM rodneyadler;
+GRANT ALL ON TABLE public.parameters TO rodneyadler;
+
+
+--
+-- Name: TABLE path_map; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.path_map FROM PUBLIC;
+REVOKE ALL ON TABLE public.path_map FROM rodneyadler;
+GRANT ALL ON TABLE public.path_map TO rodneyadler;
+
+
+--
+-- Name: TABLE path_parts; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.path_parts FROM PUBLIC;
+REVOKE ALL ON TABLE public.path_parts FROM rodneyadler;
+GRANT ALL ON TABLE public.path_parts TO rodneyadler;
+
+
+--
+-- Name: TABLE paths; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.paths FROM PUBLIC;
+REVOKE ALL ON TABLE public.paths FROM rodneyadler;
+GRANT ALL ON TABLE public.paths TO rodneyadler;
+
+
+--
+-- Name: TABLE pr_keys; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.pr_keys FROM PUBLIC;
+REVOKE ALL ON TABLE public.pr_keys FROM rodneyadler;
+GRANT ALL ON TABLE public.pr_keys TO rodneyadler;
+
+
+--
+-- Name: TABLE pr_values; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.pr_values FROM PUBLIC;
+REVOKE ALL ON TABLE public.pr_values FROM rodneyadler;
+GRANT ALL ON TABLE public.pr_values TO rodneyadler;
+
+
+--
+-- Name: TABLE request_fields; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.request_fields FROM PUBLIC;
+REVOKE ALL ON TABLE public.request_fields FROM rodneyadler;
+GRANT ALL ON TABLE public.request_fields TO rodneyadler;
+
+
+--
+-- Name: TABLE request_headers; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.request_headers FROM PUBLIC;
+REVOKE ALL ON TABLE public.request_headers FROM rodneyadler;
+GRANT ALL ON TABLE public.request_headers TO rodneyadler;
+
+
+--
+-- Name: TABLE request_modifiers; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.request_modifiers FROM PUBLIC;
+REVOKE ALL ON TABLE public.request_modifiers FROM rodneyadler;
+GRANT ALL ON TABLE public.request_modifiers TO rodneyadler;
+
+
+--
+-- Name: TABLE requests; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.requests FROM PUBLIC;
+REVOKE ALL ON TABLE public.requests FROM rodneyadler;
+GRANT ALL ON TABLE public.requests TO rodneyadler;
+
+
+--
+-- Name: TABLE schemes; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.schemes FROM PUBLIC;
+REVOKE ALL ON TABLE public.schemes FROM rodneyadler;
+GRANT ALL ON TABLE public.schemes TO rodneyadler;
+
+
+--
+-- Name: TABLE scrape_steps; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.scrape_steps FROM PUBLIC;
+REVOKE ALL ON TABLE public.scrape_steps FROM rodneyadler;
+GRANT ALL ON TABLE public.scrape_steps TO rodneyadler;
+
+
+--
+-- Name: TABLE scrapes; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.scrapes FROM PUBLIC;
+REVOKE ALL ON TABLE public.scrapes FROM rodneyadler;
+GRANT ALL ON TABLE public.scrapes TO rodneyadler;
+
+
+--
+-- Name: TABLE step_assignments; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.step_assignments FROM PUBLIC;
+REVOKE ALL ON TABLE public.step_assignments FROM rodneyadler;
+GRANT ALL ON TABLE public.step_assignments TO rodneyadler;
+
+
+--
+-- Name: TABLE step_expectations; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.step_expectations FROM PUBLIC;
+REVOKE ALL ON TABLE public.step_expectations FROM rodneyadler;
+GRANT ALL ON TABLE public.step_expectations TO rodneyadler;
+
+
+--
+-- Name: TABLE step_odd_missions; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.step_odd_missions FROM PUBLIC;
+REVOKE ALL ON TABLE public.step_odd_missions FROM rodneyadler;
+GRANT ALL ON TABLE public.step_odd_missions TO rodneyadler;
+
+
+--
+-- Name: TABLE steps; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.steps FROM PUBLIC;
+REVOKE ALL ON TABLE public.steps FROM rodneyadler;
+GRANT ALL ON TABLE public.steps TO rodneyadler;
+
+
+--
+-- Name: TABLE urls; Type: ACL; Schema: public; Owner: rodneyadler
+--
+
+REVOKE ALL ON TABLE public.urls FROM PUBLIC;
+REVOKE ALL ON TABLE public.urls FROM rodneyadler;
+GRANT ALL ON TABLE public.urls TO rodneyadler;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

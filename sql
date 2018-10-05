@@ -5,11 +5,11 @@ CREATE TABLE comment_number (
 CREATE TABLE comments (
     id SERIAL,
     user_id INTEGER,
-    comment VARCHAR (500) NOT NULL,
+    comment VARCHAR (5000) NOT NULL,
     timestamp TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id),
-    UNIQUE(comment)
+    UNIQUE(comment, timestamp, user_id)
 );
 
 CREATE TABLE users (

@@ -24,7 +24,9 @@ Ralph
 https://www.facebook.com/pages_reaction_units/more/?page_id=1657775594549456&cursor=%7B%22timeline_cursor%22%3A%221528636649%22%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D&surface=www_pages_community_tab&unit_count=8&dpr=1&fb_dtsg_ag&__user=0&__a=1&__dyn=7AzHJ4zamaWxd2umeCJDzm5UOqfoOm9AKGgS8WGnJ4WqF1eU8Eqzob4q6oF7yWCHAxiESmqa-cCCGEtyK8GEjACkwy48G5uF98SmjBXDmEgF3e7F98iGtxifGcgLAKibUSbBWAhfypfh4cx11q9AyAUOKbzAaUx5G3CmaBKVoyaDBDAx6bgS2qtolnx-q9CJ4gpCCxaE_AJkUGrxjDQEvGTx67kh3oOcyVXyoyiaCzUqykqqaKFqGVVui4p5UBaBy7GiumjEyOCDpkK25h88EyiibKbF1l2VpaCULyoaopx3xi-fWLhaJeSh3oCi9lkRzEKiehVkdz9eaDCxZaeCBAJ1e4kbzp49BVp5z4iUhDzAUgCyHxqiuiazaGtoK7uGDz8x12V98-mqumHAK8J6Kh7x6cyUOm4p8BfgKULBxWi8AgCA_HKUtAG9y9pEGFpVbV8ya-t0&__req=y&__be=-1&__pc=PHASED%3ADEFAULT&__rev=4376521
 
 
+9284 << diff
 
+11561
 
 %7B%22timeline_cursor%22%3Anull%2C%22
 
@@ -35,7 +37,11 @@ https://www.facebook.com/pages_reaction_units/more/?page_id=1657775594549456&cur
 221500000000 > Lower limit > 221000000000
 
 231645646350 > Upper limit > 222645646350 
- 
+
+221538258933
+
+221538542285
+221538258933
 221534646352
 221533264741
 221531183474
@@ -44,6 +50,14 @@ https://www.facebook.com/pages_reaction_units/more/?page_id=1657775594549456&cur
 221500000000
 221000000000
 
+
 rough step size: 1500000
 
 https://www.facebook.com/pages_reaction_units/more/?page_id=1657775594549456&cursor=%7B%22timeline_cursor%22%3A%222645646350%22%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D&surface=www_pages_community_tab&unit_count=8&dpr=1&fb_dtsg_ag&__user=0&__a=1&__req=4&__be=-1&__pc=PHASED%3ADEFAULT&__rev=4376521
+
+
+logged in
+
+https://www.facebook.com/pages_reaction_units/more/?page_id=539309746236829&cursor=%7B%22timeline_cursor%22%3Anull%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D&surface=www_pages_community_tab&unit_count=8&dpr=1&fb_dtsg_ag=AdyeydpUU00A-U3uX3ZOPYZuTgN51TTB0F2yryuPX19JeQ%3AAdzEL3n8o1cIPbsishRhqtdSsuMMxSYstUGZgY5oynRPBg&__user=100029134355964&__a=1&__dyn=7AgNe-4amaUmgDxiWJGi9FxqeCwKyaF3ozzkAjFGUqx-6ES2N6xCay8WqK6otyEnCwMyWxebmbx2axuF8iBAVXxWUPwXGt0Bx12KdwJAAhKe-2i6pV8Gicx2q1EyECVoyaxG4o4O5k2eq49842E-qqfCUkUC10xmuqdxC26dyFE-3WWyUhxyh16fmFomhC8xm252odoKUKfyo8oS1fx3ximfKKey8eohxTzEy4FeaDU8KU99u4-9xC5oOGyprx6uexfCw8Odz84GbKezHAy8uyUaoGWyXwhUky9UpxG9wzwzw&__req=j&__be=1&__pc=PHASED%3ADEFAULT&__rev=4384677&__spin_r=4384677&__spin_b=trunk&__spin_t=1538694467
+
+https://www.facebook.com/pages_reaction_units/more/?page_id=539309746236829&cursor=%7B%22timeline_cursor%22%3Anull%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D&surface=www_pages_community_tab&unit_count=8&dpr=1&fb_dtsg_ag=AdyeydpUU00A-U3uX3ZOPYZuTgN51TTB0F2yryuPX19JeQ%3AAdzEL3n8o1cIPbsishRhqtdSsuMMxSYstUGZgY5oynRPBg&__user=100029134355964&__a=1&__req=j&__be=1&__pc=PHASED%3ADEFAULT&__rev=4384677&__spin_r=4384677&__spin_b=trunk&__spin_t=1538694467
