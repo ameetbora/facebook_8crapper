@@ -33,5 +33,5 @@ class brain():
     def step(self) -> int:
         self.calculate_next_step()
         self.duplicates_this_step = 0
-        print("=---------------------------{}".format(self.current_step))
+        print("Step: ---------------------------{}".format(self.current_step))
         return self.current_step

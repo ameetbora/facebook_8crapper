@@ -11,7 +11,7 @@ huge_step = 10000000
 
 energy_oz = "https://www.facebook.com/pages_reaction_units/more/?page_id=539309746236829&cursor=%7B%22timeline_cursor%22%3A%{cn}%22%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D&surface=www_pages_community_tab&unit_count=8&dpr=1&fb_dtsg_ag&__user=0&__a=1&__req=4&__be=-1&__pc=PHASED%3ADEFAULT&__rev=4376521"
 
-bunnings = "https://www.facebook.com/pages_reaction_units/more/?page_id=1657775594549456&cursor=%7B%22timeline_cursor%22%3A%{cn}%22%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D&surface=www_pages_community_tab&unit_count=8&dpr=1&fb_dtsg_ag&__user=0&__a=1&__req=4&__be=-1&__pc=PHASED%3ADEFAULT&__rev=4376521"
+bunnings = "https://www.facebook.com/pages_reaction_units/more/?page_id=1657775594549456&cursor=%7B%22timeline_cursor%22%3A%{cn}%22%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D&surface=www_pages_community_tab&unit_count=8&dpr=1&__user=100029134355964&fb_dtsg_ag&__user=0&__a=1&__req=4&__be=-1&__pc=PHASED%3ADEFAULT&__rev=4376521"
 
 class QuotesSpider(scrapy.Spider):
     name = "comments"

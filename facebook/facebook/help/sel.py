@@ -11,6 +11,20 @@ def get_if_exists(selector, xpath: str) -> str:
     
     return "N/A"
 
+def get_int_if_exists(selector, xpath: str) -> int:
+    content = selector.xpath(xpath).extract()
+    if len(content) > 0:
+        return int(content[0])
+    
+    return 0
+
+def get_comment_number(selector) -> int:
+    content = selector.xpath("//a[@data-comment-prelude-ref]/text()").extract()
+    if len(content) > 0:
+        return int(content[0].split(" ")[0])
+    
+    return 0
+
 def get_name(selector) -> str:
     private_name = get_if_exists(selector, "//h5//span[contains(@class, '_39_n')]/text()")
     if private_name == "N/A":
@@ -24,7 +38,10 @@ def comment_data(comment: str) -> dict:
         "link": get_if_exists(selector, "//h5//a/@href"),
         "name": get_name(selector),
         "comment": get_if_exists(selector, "//p"),
-        "timestamp": get_if_exists(selector, "//span[contains(@class, 'timestampContent')]/text()"),
+        "timestamp": get_int_if_exists(selector, "//span[contains(@class, 'timestampContent')]/parent::abbr/@data-utime"),
+        # "reacts": get_int_if_exists(selector, "//span[@aria-label='See who reacted to this']/following-sibling::a/span/span/text()"),
+        # "comment_number": get_comment_number(selector),
+        # "comments_link": get_if_exists(selector, "//a[@data-comment-prelude-ref]/@href")
     }
 
 def first_user(body: HtmlResponse) -> str:

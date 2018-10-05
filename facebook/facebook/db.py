@@ -14,3 +14,26 @@ class db:
     def update_highest_cn(self, new_highest: int):
         self.cursor.execute("""INSERT INTO comment_number (highest) VALUES ({});""".format(new_highest))
         self.connection.commit()
+    
+    def save_comment(self, comment_data: dict):
+        user_id = self.save_user(comment_data)
+        self.save_comment_details(user_id, comment_data)
+        self.connection.commit()
+
+    def save_user(self, comment_data: dict) -> int: 
+        name = comment_data["name"]
+        link = comment_data["link"]
+        self.cursor.execute("""
+        INSERT INTO users (name, link)
+        VALUES('{name}', '{link}')
+        ON CONFLICT (name, link) DO UPDATE SET name = '{name}'
+        RETURNING id;""".format(name=name, link=link))
+        return self.cursor.fetchone()[0]
+    
+    def save_comment_details(self, user_id, comment_data):
+        comment = comment_data["comment"]
+        timestamp = comment_data["timestamp"]
+        self.cursor.execute("""
+        INSERT INTO comments (user_id, comment, timestamp)
+        VALUES ({user_id}, '{comment}', to_timestamp({timestamp}));
+        """.format(user_id = user_id, comment=comment, timestamp=timestamp))

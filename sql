@@ -3,10 +3,28 @@ CREATE TABLE comment_number (
 );
 
 CREATE TABLE comments (
-    id INTEGER,
+    id SERIAL,
+    user_id INTEGER,
+    comment VARCHAR (500) NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    UNIQUE(comment)
+);
+
+CREATE TABLE users (
+    id SERIAL,
     name VARCHAR(80) NOT NULL,
     link VARCHAR(300) NOT NULL,
-    comment VARCHAR (500) NOT NULL,
-    timestamp VARCHAR(80) NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE(name, link)
 );
+
+
+INSERT INTO users (name, link) VALUES ({name}, {link})
+WHERE NOT EXISTS (
+    SELECT id
+    FROM users
+    WHERE name = {name} AND link = {link}
+    )
+returning id
