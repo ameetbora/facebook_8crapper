@@ -37,7 +37,7 @@ def comment_data(comment: str) -> dict:
     return {
         "link": get_if_exists(selector, "//h5//a/@href"),
         "name": get_name(selector),
-        "comment": get_if_exists(selector, "//p"),
+        "comment": get_if_exists(selector, "//p/text()"),
         "timestamp": get_int_if_exists(selector, "//span[contains(@class, 'timestampContent')]/parent::abbr/@data-utime"),
         # "reacts": get_int_if_exists(selector, "//span[@aria-label='See who reacted to this']/following-sibling::a/span/span/text()"),
         # "comment_number": get_comment_number(selector),

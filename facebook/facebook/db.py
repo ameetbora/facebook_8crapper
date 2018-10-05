@@ -25,9 +25,9 @@ class db:
         link = comment_data["link"]
         self.cursor.execute("""
         INSERT INTO users (name, link)
-        VALUES('{name}', '{link}')
-        ON CONFLICT (name, link) DO UPDATE SET name = '{name}'
-        RETURNING id;""".format(name=name, link=link))
+        VALUES(%s, %s)
+        ON CONFLICT (name, link) DO UPDATE SET name = %s
+        RETURNING id;""", (name, link, name))
         return self.cursor.fetchone()[0]
     
     def save_comment_details(self, user_id, comment_data):
@@ -35,5 +35,6 @@ class db:
         timestamp = comment_data["timestamp"]
         self.cursor.execute("""
         INSERT INTO comments (user_id, comment, timestamp)
-        VALUES ({user_id}, '{comment}', to_timestamp({timestamp}));
-        """.format(user_id = user_id, comment=comment, timestamp=timestamp))
+        VALUES (%s, %s, to_timestamp(%s))
+        ON CONFLICT (user_id, comment, timestamp) DO NOTHING;
+        """, (user_id, comment, timestamp))

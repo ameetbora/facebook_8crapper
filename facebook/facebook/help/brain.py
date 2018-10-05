@@ -8,7 +8,7 @@ class brain():
         self.duplicates_this_step = 1
 
     def is_duplicate(self, comment: dict) -> bool:
-        identifier = comment["name"] + comment["timestamp"] + comment["link"]
+        identifier = str(comment["timestamp"]) + comment["link"]
         if identifier in self.recent_identifiers:
             self.duplicate_count += 1
             self.duplicates_this_step += 1

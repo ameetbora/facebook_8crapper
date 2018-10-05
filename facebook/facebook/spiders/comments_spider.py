@@ -30,16 +30,20 @@ class QuotesSpider(scrapy.Spider):
 
     def parse(self, response):
         if QuotesSpider.has_correct_content_type(response):
+            comments_to_save = []
             for comment in sel.all_comments(conv.body_html(response.body)):
                 comment_data = sel.comment_data(comment)
                 if not self.brain.is_duplicate(comment_data):
-                    yield comment_data
+                    comments_to_save.append(comment_data)
 
             self.current_cn -= self.brain.step()
             yield scrapy.Request(
                 url=bunnings.format(cn=self.current_cn),
                 callback=self.parse
             )
+
+            for comment in comments_to_save:
+                self.db.save_comment(comment)
 
     def find_starting_cn(self, response):
         if QuotesSpider.has_correct_content_type(response):
