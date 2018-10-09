@@ -34,13 +34,19 @@ class db:
         return self.cursor.fetchone()[0]
     
     def save_comment_details(self, user_id: int, supplier_id: int, comment_data: dict):
-        comment = comment_data["comment"]
+        comment = comment_data["comment"]\
+
+        # Probably non need to store the entirety of very long comments in the database
+        if len(comment) > 5000:
+            comment = comment[:5000] + "..."
+
         timestamp = comment_data["timestamp"]
+        tagged = comment_data["tagged"]
         self.cursor.execute("""
-        INSERT INTO comments (user_id, supplier_id, comment, timestamp)
-        VALUES (%s, %s, %s, to_timestamp(%s))
+        INSERT INTO comments (user_id, supplier_id, comment, timestamp, tagged)
+        VALUES (%s, %s, %s, to_timestamp(%s), %s)
         ON CONFLICT (user_id, comment, timestamp) DO NOTHING;
-        """, (user_id, supplier_id, comment, timestamp))
+        """, (user_id, supplier_id, comment, timestamp, tagged))
     
     def save_supplier(self, supplier_name, page_id) -> int:
         self.cursor.execute("""
@@ -49,3 +55,7 @@ class db:
         ON CONFLICT (name, page_id) DO UPDATE SET name = %s
         RETURNING id;""", (supplier_name, page_id, supplier_name))
         return self.cursor.fetchone()[0]
+
+    def get_suppliers(self) -> dict:
+        self.cursor.execute("""SELECT id, name, page_id FROM suppliers""")
+        return self.cursor.fetchall()

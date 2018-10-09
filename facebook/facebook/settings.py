@@ -20,6 +20,7 @@ NEWSPIDER_MODULE = 'facebook.spiders'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
+CONCURRENT_REQUESTS_PER_DOMAIN = 4
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32

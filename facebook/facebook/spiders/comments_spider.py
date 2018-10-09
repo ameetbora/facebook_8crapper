@@ -8,9 +8,6 @@ step_size = 1500000
 dub_step = 3000000
 huge_step = 10000000
 
-# page_url = "https://www.facebook.com/pages_reaction_units/more/?page_id=274936216352431&cursor=%7B%22timeline_cursor%22%3A%{cn}%22%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D&surface=www_pages_community_tab&unit_count=8&dpr=1&fb_dtsg_ag=AdxWdYigVNnPeSEjezhQ9TfEQ7aiPXwjyqYFE6P0hd9muw%3AAdzxXGemN8chbHJ5KQSztKuAjUNqP96r_CzttMLml2ZdRA&__user=100029134355964&__a=1&__dyn=7AgNe-4amaUmgDxiWJGi9FxqeCwKyaF3ozzkAjFGUqx-6ES2N6xCay8WqK6otyEnCwMyWxebmbx2axuF8iBAVXxWUPwXGt0Bx12KdwJAAhKe-2h1rDAyF8O49ElwQxSayrBy8G6Ehwj8lg8VEgAwgazVFAeCUkUC10xmul3opwxzoGqfw-KEK4ooAghzRGm5Apy8lwxgC3mbKbzUC26dUcUpx3ximfKKey8eohx2cUW8xajyF-2bixK8BUjUC6po-cGECmUhDzA4Kq1Ix-GDz8uwHBBKezHAy8uyUaoGWyXwhUOXy9UpxG9wzxefCU&__req=y&__be=1&__pc=PHASED%3ADEFAULT&__rev=4395378&__spin_r=4395378&__spin_b=trunk&__spin_t=1539049028"
-
-
 class CommentsSpider(scrapy.Spider):
     name = "comments"
 
@@ -32,7 +29,7 @@ class CommentsSpider(scrapy.Spider):
 
     def parse(self, response):
         print("-----xxxxx-----xxxxxx------" + str(self.brain.current_step))
-        if CommentsSpider.has_correct_content_type(response) and CommentsSpider.response_long_enough(response) and                    self.brain.current_step > 1000:
+        if CommentsSpider.has_correct_content_type(response) and CommentsSpider.response_long_enough(response):
             comments_to_save = []
             for comment in sel.all_comments(conv.body_html(response.body)):
                 comment_data = sel.comment_data(comment)

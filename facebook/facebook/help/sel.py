@@ -32,13 +32,25 @@ def get_name(selector) -> str:
     
     return private_name
 
+def contains_node(selector, xpath: str) -> bool:
+    nodes = selector.xpath(xpath)
+    return len(nodes) > 0
+
+def get_comment_content(selector) -> str:
+    content = selector.xpath("//div[@data-ad-preview='message']//text()").extract()
+    if len(content) > 0:
+        return "".join(content)
+
+    return "N/A"
+
 def comment_data(comment: str) -> dict:
     selector = HtmlResponse(url="", body=comment, encoding="utf-8")
     return {
         "link": get_if_exists(selector, "//span[@class='fwb fcg']//a/@href"),
         "name": get_name(selector),
-        "comment": get_if_exists(selector, "//p/text()"),
+        "comment": get_comment_content(selector),
         "timestamp": get_int_if_exists(selector, "//span[contains(@class, 'timestampContent')]/parent::abbr/@data-utime"),
+        "tagged": contains_node(selector, "//span[@class='fcg'][contains(., 'was mentioned in a')]"),
         # "reacts": get_int_if_exists(selector, "//span[@aria-label='See who reacted to this']/following-sibling::a/span/span/text()"),
         # "comment_number": get_comment_number(selector),
         # "comments_link": get_if_exists(selector, "//a[@data-comment-prelude-ref]/@href")
