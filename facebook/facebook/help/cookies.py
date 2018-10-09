@@ -12,8 +12,6 @@ def get_facebook_cookie(user_email: str, user_password: str) -> dict:
     password.send_keys(user_password)
     submit.click()
 
-    driver.get("https://www.facebook.com/OnlyatBunnings/community/?ref=page_internal")
-
     cookies = {}
     for cookie in driver.get_cookies():
         cookies[cookie["name"]] = cookie["value"]

@@ -31,7 +31,8 @@ class CommentsSpider(scrapy.Spider):
         )
 
     def parse(self, response):
-        if CommentsSpider.has_correct_content_type(response) or CommentsSpider.response_long_enough(response):
+        print("-----xxxxx-----xxxxxx------" + str(self.brain.current_step))
+        if CommentsSpider.has_correct_content_type(response) and CommentsSpider.response_long_enough(response) and                    self.brain.current_step > 1000:
             comments_to_save = []
             for comment in sel.all_comments(conv.body_html(response.body)):
                 comment_data = sel.comment_data(comment)
