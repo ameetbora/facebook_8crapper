@@ -6,6 +6,9 @@ class db:
     def __init__(self):
         self.connection = psycopg2.connect(conn_str)
         self.cursor = self.connection.cursor()
+
+    def commit(self):
+        self.connection.commit()
     
     def get_highest_cn(self) -> int:
         self.cursor.execute("""SELECT highest FROM comment_number ORDER BY highest DESC LIMIT 1""")
@@ -13,12 +16,12 @@ class db:
     
     def update_highest_cn(self, new_highest: int):
         self.cursor.execute("""INSERT INTO comment_number (highest) VALUES ({});""".format(new_highest))
-        self.connection.commit()
+        self.commit()
     
-    def save_comment(self, comment_data: dict):
+    def save_comment(self, comment_data: dict, supplier_id: int):
         user_id = self.save_user(comment_data)
-        self.save_comment_details(user_id, comment_data)
-        self.connection.commit()
+        self.save_comment_details(user_id, supplier_id, comment_data)
+        self.commit()
 
     def save_user(self, comment_data: dict) -> int: 
         name = comment_data["name"]
@@ -30,11 +33,19 @@ class db:
         RETURNING id;""", (name, link, name))
         return self.cursor.fetchone()[0]
     
-    def save_comment_details(self, user_id, comment_data):
+    def save_comment_details(self, user_id: int, supplier_id: int, comment_data: dict):
         comment = comment_data["comment"]
         timestamp = comment_data["timestamp"]
         self.cursor.execute("""
-        INSERT INTO comments (user_id, comment, timestamp)
-        VALUES (%s, %s, to_timestamp(%s))
+        INSERT INTO comments (user_id, supplier_id, comment, timestamp)
+        VALUES (%s, %s, %s, to_timestamp(%s))
         ON CONFLICT (user_id, comment, timestamp) DO NOTHING;
-        """, (user_id, comment, timestamp))
+        """, (user_id, supplier_id, comment, timestamp))
+    
+    def save_supplier(self, supplier_name, page_id) -> int:
+        self.cursor.execute("""
+        INSERT INTO suppliers (name, page_id)
+        VALUES(%s, %s)
+        ON CONFLICT (name, page_id) DO UPDATE SET name = %s
+        RETURNING id;""", (supplier_name, page_id, supplier_name))
+        return self.cursor.fetchone()[0]

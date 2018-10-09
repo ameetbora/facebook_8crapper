@@ -5,10 +5,12 @@ CREATE TABLE comment_number (
 CREATE TABLE comments (
     id SERIAL,
     user_id INTEGER,
+    supplier_id INTEGER,
     comment VARCHAR (5000) NOT NULL,
     timestamp TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (supplier_id) REFERENCES suppliers (id),
     UNIQUE(comment, timestamp, user_id)
 );
 
@@ -28,3 +30,11 @@ WHERE NOT EXISTS (
     WHERE name = {name} AND link = {link}
     )
 returning id
+
+CREATE TABLE suppliers (
+    id SERIAL, 
+    page_id BIGINT,
+    name VARCHAR(100),
+    PRIMARY KEY (id),
+    UNIQUE(name, page_id)
+);

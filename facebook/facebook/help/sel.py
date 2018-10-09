@@ -26,16 +26,16 @@ def get_comment_number(selector) -> int:
     return 0
 
 def get_name(selector) -> str:
-    private_name = get_if_exists(selector, "//h5//span[contains(@class, '_39_n')]/text()")
+    private_name = get_if_exists(selector, "//span[@class='fwb fcg']//span[contains(@class, '_39_n')]/text()")
     if private_name == "N/A":
-        return get_if_exists(selector, "//h5//a/text()")
+        return get_if_exists(selector, "//span[@class='fwb fcg']//a/text()")
     
     return private_name
 
 def comment_data(comment: str) -> dict:
     selector = HtmlResponse(url="", body=comment, encoding="utf-8")
     return {
-        "link": get_if_exists(selector, "//h5//a/@href"),
+        "link": get_if_exists(selector, "//span[@class='fwb fcg']//a/@href"),
         "name": get_name(selector),
         "comment": get_if_exists(selector, "//p/text()"),
         "timestamp": get_int_if_exists(selector, "//span[contains(@class, 'timestampContent')]/parent::abbr/@data-utime"),
@@ -45,4 +45,4 @@ def comment_data(comment: str) -> dict:
     }
 
 def first_user(body: HtmlResponse) -> str:
-    return body.xpath("//div[contains(@class, 'userContentWrapper')]//h5//span[@class='fwb fcg']//a/text()").extract()[0]
+    return body.xpath("//div[contains(@class, 'userContentWrapper')]//span[@class='fwb fcg']//a/text()").extract()[0]
