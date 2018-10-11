@@ -8,6 +8,7 @@ CREATE TABLE comments (
     supplier_id INTEGER,
     comment VARCHAR (5000) NOT NULL,
     timestamp TIMESTAMP NOT NULL,
+    tagged BOOL NOT NULL DEFAULT FALSE,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (supplier_id) REFERENCES suppliers (id),
@@ -16,8 +17,8 @@ CREATE TABLE comments (
 
 CREATE TABLE users (
     id SERIAL,
-    name VARCHAR(80) NOT NULL,
-    link VARCHAR(300) NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    link VARCHAR(1000) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE(name, link)
 );

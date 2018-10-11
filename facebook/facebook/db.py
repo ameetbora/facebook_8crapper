@@ -2,6 +2,13 @@ import psycopg2
 
 conn_str = "dbname='facebook_comments' user='postgres'" # Might want to change this
 
+def truncate(value: str, length: int) -> str:
+    if len(value) > length:
+        return value[:length] + "..."
+    
+    return value
+
+
 class db:
     def __init__(self):
         self.connection = psycopg2.connect(conn_str)
@@ -24,8 +31,8 @@ class db:
         self.commit()
 
     def save_user(self, comment_data: dict) -> int: 
-        name = comment_data["name"]
-        link = comment_data["link"]
+        name = truncate(comment_data["name"], 150)
+        link = truncate(comment_data["link"], 900)
         self.cursor.execute("""
         INSERT INTO users (name, link)
         VALUES(%s, %s)
@@ -34,11 +41,10 @@ class db:
         return self.cursor.fetchone()[0]
     
     def save_comment_details(self, user_id: int, supplier_id: int, comment_data: dict):
-        comment = comment_data["comment"]\
+        comment = truncate(comment_data["comment"], 5000)
 
         # Probably non need to store the entirety of very long comments in the database
-        if len(comment) > 5000:
-            comment = comment[:5000] + "..."
+
 
         timestamp = comment_data["timestamp"]
         tagged = comment_data["tagged"]
