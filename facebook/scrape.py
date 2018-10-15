@@ -17,7 +17,6 @@ page_id = sys.argv[2]
 
 database = db.db()
 supplier_id = database.save_supplier(page_name, page_id)
-database.commit()
 
 cookies = cookies.get_facebook_cookie("sallymuntzy@outlook.com", "r34hge%V&BF3ghf")
 base_url = url.page_url(page_id, user_id)
