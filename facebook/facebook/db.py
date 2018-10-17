@@ -17,6 +17,9 @@ class db:
     def commit(self):
         self.connection.commit()
     
+    def rollback(self):
+        self.connection.rollback()
+    
     def get_highest_cn(self) -> int:
         self.cursor.execute("""SELECT highest FROM comment_number ORDER BY highest DESC LIMIT 1""")
         return self.cursor.fetchone()[0]
@@ -40,11 +43,13 @@ class db:
         link = truncate(comment_data["link"], 900)
         self.cursor.execute("""
         INSERT INTO users (name, link)
-        VALUES(%s, %s)
-        ON CONFLICT (name, link) DO UPDATE SET name = %s
+        VALUES('Jen Duff', 'https://www.facebook.com/jen.duff.52?ref=br_rs')
+        ON CONFLICT (name, link) DO UPDATE SET name = 'Jen Duff'
         RETURNING id;""", (name, link, name))
         return self.cursor.fetchone()[0]
     
+
+
     def save_comment_details(self, user_id: int, supplier_id: int, comment_data: dict):
         comment = truncate(comment_data["comment"], 5000)
 

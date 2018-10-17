@@ -12,18 +12,38 @@ def login(driver, user_email: str, user_password: str):
     submit.click()
 
 def keep_scrolling(driver):
-    results_end_notifiers = driver.find_elements_by_xpath("//div[text()='End of results']")
-    if len(results_end_notifiers) > 0:
-        print("Looks like we found all the likers.")
-        return True
-
-    else:
-        loading_boxes = driver.find_elements_by_xpath("//span[text()='Loading more results...']")
-        if len(loading_boxes) > 0:
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight + 1000);")
-            time.sleep(1)
-            keep_scrolling(driver)
+    while True:
+        results_end_notifiers = driver.find_elements_by_xpath("//div[text()='End of results']")
+        if len(results_end_notifiers) > 0:
+            print("Looks like we found all the likers.")
+            return True
 
         else:
-            print("We couldn't find the end results notifier or the loading box. Something probably went wrong. Maybe the Zucc is onto us.")
-            return False
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight + 1000);")
+            time.sleep(1)
+
+def get_likers(driver):
+    likers = []
+    links = [link.get_attribute("href") for link in driver.find_elements_by_xpath("//table[@role='presentation']//tr//td[position()=2]//a[not(@class)]")]
+    names = [name.text for name in driver.find_elements_by_xpath("//table[@role='presentation']//tr//td[position()=2]//a[not(@class)]/div/div")]
+
+    if len(names) > 0 and len(names) == len(links):
+        for i in range(len(links)):
+            likers.append({
+                "name": names[i],
+                "link": links[i],
+            })
+    else:
+        print("The names And links didn't match, something is wrong with our xpathing.")
+    
+    return likers
+
+def get_next_likers(driver):
+    next_page_link = driver.find_elements_by_xpath("//div[@id='see_more_pager']/a")
+
+    if len(next_page_link) > 0:
+        next_page_link[0].click()
+        return True
+    else:
+        print("looks like we reached the end")
+        return False

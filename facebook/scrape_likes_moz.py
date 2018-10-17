@@ -1,8 +1,10 @@
 import sys
 import time
+import random
 from likers import steps
 from likers import save
 from likers import setup
+from facebook import db
 
 page_name = sys.argv[1]
 page_id = sys.argv[2]
@@ -15,15 +17,31 @@ user_password = "r34hge%V&BF3ghf"
 
 likers_url = "https://m.facebook.com/search/{}/likers".format(page_id)
 
-driver = setup.driver()
+driver = setup.driver_moz()
 
 steps.login(driver, user_email, user_password)
 
 driver.get(likers_url)
 
-steps.keep_scrolling(driver)
+database = db.db()
+supplier_id = database.save_supplier(page_name, page_id)
 
-save.save_likers(driver.page_source, page_name, page_id)
+while True:
+
+    try:
+        likers = steps.get_likers(driver)
+        for liker in likers:
+            database.save_like(liker, supplier_id)
+    except Exception as e:
+        print(e)
+        database.rollback()
+        continue
+    
+        
+    time.sleep(random.randint(2, 30))
+    success = steps.get_next_likers(driver)
+    if not success:
+        break
 
 print("Hell yeah")
 
