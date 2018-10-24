@@ -38,23 +38,22 @@ class db:
         self.save_like_details(user_id, supplier_id)
         self.commit()
 
-    def save_user(self, comment_data: dict) -> int: 
+    def save_user(self, comment_data: dict) -> int:
+        print(comment_data)
         name = truncate(comment_data["name"], 150)
         link = truncate(comment_data["link"], 900)
         self.cursor.execute("""
         INSERT INTO users (name, link)
-        VALUES('Jen Duff', 'https://www.facebook.com/jen.duff.52?ref=br_rs')
-        ON CONFLICT (name, link) DO UPDATE SET name = 'Jen Duff'
+        VALUES(%s, %s)
+        ON CONFLICT (name, link) DO UPDATE SET name = %s
         RETURNING id;""", (name, link, name))
+        self.commit()
         return self.cursor.fetchone()[0]
-    
-
 
     def save_comment_details(self, user_id: int, supplier_id: int, comment_data: dict):
         comment = truncate(comment_data["comment"], 5000)
 
         # Probably non need to store the entirety of very long comments in the database
-
 
         timestamp = comment_data["timestamp"]
         tagged = comment_data["tagged"]

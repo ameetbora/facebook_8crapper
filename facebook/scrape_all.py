@@ -20,7 +20,7 @@ cookies_to_use = cookies.get_facebook_cookie("sallymuntzy@outlook.com", "r34hge%
 for supplier in suppliers:
     supplier_id = supplier[0]
 
-    if supplier_id is 14:
+    if supplier_id in [77]:
         base_url = url.page_url(supplier[2], user_id)
 
         process = CrawlerProcess({

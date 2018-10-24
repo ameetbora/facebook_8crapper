@@ -11,8 +11,9 @@ def login(driver, user_email: str, user_password: str):
     password.send_keys(user_password)
     submit.click()
 
-def keep_scrolling(driver):
-    while True:
+def keep_scrolling(driver, times: int = 99999999999):
+    while times > 0:
+        times -= 1
         results_end_notifiers = driver.find_elements_by_xpath("//div[text()='End of results']")
         if len(results_end_notifiers) > 0:
             print("Looks like we found all the likers.")
@@ -20,7 +21,7 @@ def keep_scrolling(driver):
 
         else:
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight + 1000);")
-            time.sleep(1)
+            time.sleep(3)
 
 def get_likers(driver):
     likers = []
@@ -44,6 +45,11 @@ def get_next_likers(driver):
     if len(next_page_link) > 0:
         next_page_link[0].click()
         return True
-    else:
-        print("looks like we reached the end")
-        return False
+
+    return False
+
+
+def get_facebook_warning(driver):
+    warning = driver.find_elements_by_xpath("//div[contains(text(), 'It looks like you’re using this feature in a way it wasn’t meant to be used.')]")
+
+    return len(warning) > 0
